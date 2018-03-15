@@ -1,0 +1,300 @@
+---
+title: "Dendrobates_auratus_transcriptome"
+author: "Adam Stuckert"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(biomaRt)
+library(sleuth)
+library(dplyr)
+library(foreach)
+library(doParallel)
+library(data.table)
+```
+
+
+```{r}
+
+setwd("~/R/R projects/AuratusTranscriptome")
+base_dir <- "C:/Users/Adam Stuckert/Documents/R/R projects/AuratusTranscriptome"
+sample_id <- dir(file.path(base_dir, "kallisto_quants"))
+#sample_id
+kal_dirs <- sapply(sample_id, function(id) file.path(base_dir, "kallisto_quants", id))
+#kal_dirs
+samples <- read.table("auratus_samples.txt", header = TRUE)
+samples <- samples[order(samples$sample),]
+samples <- dplyr::mutate(samples, path = kal_dirs)
+samples
+```
+
+
+
+```{r}
+so <- sleuth_prep(samples)
+
+sleuth_save(so, "auratus_sleuth")
+plot_pca(so, text_labels = TRUE)
+```
+
+
+I can skip the above chunk of code and come here in the future, and just load the sleuth object (so <- sleuth_load(auratus_sleuth))
+
+```{r}
+plot_pca(so, point_size = 0.001, units = 'est_counts') + geom_point() + aes(size = 3, colour = samples$morph) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(values=c("navyblue","forestgreen","tan3","dodgerblue"), title = "Morph", override.aes = list(size=4))) + guides(size=FALSE)
+
+ggsave("auratus_est-counts_pca.tiff", width = 6.81, height = 3.99)
+```
+
+
+```{r}
+plot_pca(so, point_size = 0.001, units = 'tpm') + geom_point() + aes(size = 3, colour = samples$morph) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(values=c("navyblue","forestgreen","tan3","dodgerblue"), title = "Morph", override.aes = list(size=4))) + guides(size=FALSE)
+
+ggsave("auratus_tpm_pca.tiff", width = 6.81, height = 3.99)
+```
+
+
+
+
+```{r}
+plot_loadings(so, pc_input = 1)
+plot_loadings(so, pc_input = 2)
+```
+
+```{r}
+# population
+# first prep the population matrix
+pop_design <- model.matrix(~0 + samples$morph)
+colnames(pop_design) <- levels(samples$morph)
+
+
+
+sopop <- sleuth_prep(samples, full_model = pop_design, num_cores = 6)
+
+sopop <- sleuth_fit(sopop, formula = pop_design, fit_name = "full")
+sopop <- sleuth_fit(sopop, formula = ~ 1, fit_name = "reduced")
+#so <- sleuth_fit(so, full_model = spline_design)
+models(sopop)
+sopop_lrt <- sleuth_lrt(sopop, "reduced", "full")
+# so_wt <- sleuth_wt(so, "reduced", "full")
+# Ok I don't know why that doesn't actually work....
+
+pop_lrt_results <- sleuth_results(sopop_lrt, 'reduced:full', test_type = 'lrt')
+table(pop_lrt_results[,"qval"] < 0.05) #9701 significant transcripts between the null and the others...
+pop_sig_results <-  pop_lrt_results[order(pop_lrt_results$qval),]
+pop_siggies <- pop_sig_results[ which(pop_sig_results$qval < 0.05),]
+
+```
+
+Ok, 2,824 'significant' transcripts (statistically speaking). This is about 8.1% of transcripts. Now on to do some differential expression by candidate color genes, followed by some fancy shit like GO analyses. Now is probably a good time to attempt to learn that bullshit.
+
+
+
+I will now attempt to get the loadings from the PCA, which uses the function prcomp().
+
+```{r}
+
+spread_abundance_by <- function(abund, var, which_order) {
+  # var <- lazyeval::lazy(var)
+  var_spread <- abund %>%
+    select_("target_id", "sample", var) %>%
+    tidyr::spread_("sample", var) %>%
+    as.data.frame(stringsAsFactors = FALSE)
+
+  rownames(var_spread) <- var_spread$target_id
+  var_spread["target_id"] <- NULL
+
+  result <- as.matrix(var_spread)
+
+  result[, which_order, drop = FALSE]
+}
+
+mat <- spread_abundance_by(so$obs_norm, "tpm",
+      so$sample_to_covariates$sample)
+
+#this will run the pca, and this is what is actually being run in sleuth
+ pca_res <- prcomp(t(mat))
+ 
+ # This gives the relative contribution of each principal component, as well as the std
+ summary(pca_res) 
+ 
+ # The following bits probably aren't needed, but may be interesting for looking at contributions of specific transcripts (ie, color genes)
+ pca_res$rotation %>% head
+ 
+ aload <- abs(pca_res$rotation) #saves the absolute values
+ 
+ # this gives the relative contribution to each principal component...
+ sweep(aload, 2, colSums(aload), "/") %>% head 
+ 
+ # For example, Melanocortin receptor is probably Transcript_23342, so I can look at that transcript
+ # cont <- sweep(aload, 2, colSums(aload), "/") 
+ # cont <- as.data.frame(cont)
+ # cont["Transcript_23342",]
+ 
+ # OK, soooo not a big contribution here.
+ 
+```
+
+
+Looks like PC1 = 36% of the variance and PC2 = 20%. Doesn't explain a huge amount of the variation.
+
+
+Load the importance for both PC1 and PC2 in descending order (ie, those with the biggest effect on the principal component will be first).
+
+
+```{r}
+pc <- aload[,c(1:2)]
+pc <- as.data.frame(pc)
+pc <- tibble::rownames_to_column(pc, var = "transcript")
+
+pc1 <- pc[order(-pc$PC1),]
+pc1 <- pc1[,-3]
+
+pc2 <- pc[order(-pc$PC2),]
+pc2 <- pc2[,-2]
+
+
+```
+
+
+Next I'll use a Xenopus annotation and Biomart to look at gene expression and gene ontology analyses, particularly with targeted color genes. Forthis, I've already downloaded the appropriate data from BioMart. 
+
+### Note: I really should figure out a way to save these commands in a chunk that isn't run because it takes too long. I'm sure that is a thing in markdown.
+
+
+```{r}
+
+# First download the Xenopus annotation from linux/enrique
+xenann <- read.table("auratus2xenopus_tophit.txt", header = FALSE, fill = TRUE)
+colnames(xenann)[c(1:12)] <- c("transcript_id", "ensembl_peptide_id_version", "percentage_id_matches",
+                              "alignment_length", "number_mismatches", "number_gap_openings",
+                              "query_start", "query_end", "alignment_start", "alignment_end",
+                              "expected_value", "bitscore")
+
+ensembl=useMart("ensembl")
+xenopus <- useMart("ensembl", dataset = "xtropicalis_gene_ensembl")
+
+t2g <- biomaRt::getBM(attributes = c("ensembl_peptide_id_version", "ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = xenopus)        
+write.csv(t2g, "xenopus_id2gene.csv")
+
+# t2g <- as.data.frame(fread("xenopus_id2gene.csv"))
+# t2g <- t2g[,-1] 
+
+# t2g <- fread("xenopus_auratus_t2g_data.csv")
+# t2g <- t2g[,-1]
+
+xen <- xenann[,c(1:2)]
+
+
+biggie <- dplyr::left_join(xen, t2g, by = "ensembl_peptide_id_version")
+
+#t2g <- biomaRt::getBM(attributes = c("ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = mart)
+biggie <- dplyr::rename(biggie, target_id = transcript_id,
+  ens_gene = ensembl_gene_id, ext_gene = external_gene_name)
+
+# so <- sleuth_prep(s2c, target_mapping = t2g)
+
+# so2g <- sleuth_prep(samples, target_mapping = biggie)
+
+
+# population
+# first prep the population matrix
+pop_design <- model.matrix(~0 + samples$morph)
+colnames(pop_design) <- levels(samples$morph)
+
+
+
+sopop <- sleuth_prep(samples, full_model = pop_design, num_cores = 6, target_mapping = biggie)
+
+sopop <- sleuth_fit(sopop, formula = pop_design, fit_name = "full")
+sopop <- sleuth_fit(sopop, formula = ~ 1, fit_name = "reduced")
+#so <- sleuth_fit(so, full_model = spline_design)
+models(sopop)
+sopop_lrt <- sleuth_lrt(sopop, "reduced", "full")
+# so_wt <- sleuth_wt(so, "reduced", "full")
+# Ok I don't know why that doesn't actually work....
+
+pop_lrt_results <- sleuth_results(sopop_lrt, 'reduced:full', test_type = 'lrt')
+table(pop_lrt_results[,"qval"] < 0.05) #2,824 significant transcripts between the null and the others...
+pop_sig_results <-  pop_lrt_results[order(pop_lrt_results$qval),]
+pop_siggies <- pop_sig_results[ which(pop_sig_results$qval < 0.05),]
+```
+
+
+Get the significant ones, and only those that are classified as "genes" with an external gene name. I'm going to load this into GOrilla for now.
+
+```{R}
+GO <- dplyr::filter(pop_siggies, ext_gene != "NA")
+GO <- dplyr::filter(GO, ext_gene != "")
+
+write.csv(GO, "xenopus_genes4GOrilla.csv")
+```
+
+
+Now I will go through the series of candidate color genes to see what is differentially expressed between the color morphs. These color genes are saved in a csv which we've compiled.
+
+
+```{r}
+colors <- read.table("color_genes.txt")
+colnames(colors)[1] <- "ext_gene"
+
+colors <- dplyr::left_join(colors, pop_lrt_results, by = "ext_gene")
+
+## Order them by 'significance'
+colors <-  colors[order(colors$qval),]
+
+# Drop color genes that don't have an associated transcript
+colors <- dplyr::filter(colors, target_id != "NA")
+
+
+##### This will iterate through and make a nice figure for each
+
+ #color <- data.frame(transcripts = character(28), genes = character(28))
+#color$transcripts <- c("Transcript_23342","Transcript_68280")
+
+
+#first make an empty dataframe
+
+
+for (i in 1:nrow(colors)){
+  transcript <- colors[i,2]
+  gene <- colors[i,1]
+  qval <- colors[i,5]
+  tmp <- sopop$obs_norm %>% dplyr::filter(target_id == transcript)  ### These are normalized values I think!
+  tmp <- dplyr::full_join(sopop$sample_to_covariates, tmp, by = 'sample')
+  tmp
+  
+  
+a <- ggplot(tmp, aes(x=morph, y=est_counts)) + geom_point(aes(size = 3, color = morph)) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(title = "Color morph", override.aes = list(size=4))) +  geom_smooth(method = loess) + ggtitle(paste0(gene, "\n(", transcript, "), q value = ", qval)) + guides(size=FALSE)
+ 
+ print(a)
+ 
+  ggsave(paste0("colorgene-figures/", gene, "-", transcript, ".png"), width = 6.81, height = 3.99)
+}
+
+write.csv(colors, "auratus_color_gene_stats.csv")
+
+```
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
