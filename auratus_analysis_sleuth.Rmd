@@ -65,7 +65,47 @@ plot_loadings(so, pc_input = 1)
 plot_loadings(so, pc_input = 2)
 ```
 
+
+Next I'll use a Xenopus annotation and Biomart to look at gene expression and gene ontology analyses, particularly with targeted color genes. Forthis, I've already downloaded the appropriate data from BioMart. 
+
+
+
+
 ```{r}
+
+# First download the Xenopus annotation from linux/enrique
+xenann <- read.table("auratus2xenopus_tophit.txt", header = FALSE, fill = TRUE)
+colnames(xenann)[c(1:12)] <- c("transcript_id", "ensembl_peptide_id_version", "percentage_id_matches",
+                              "alignment_length", "number_mismatches", "number_gap_openings",
+                              "query_start", "query_end", "alignment_start", "alignment_end",
+                              "expected_value", "bitscore")
+
+ensembl=useMart("ensembl")
+xenopus <- useMart("ensembl", dataset = "xtropicalis_gene_ensembl")
+
+t2g <- biomaRt::getBM(attributes = c("ensembl_peptide_id_version", "ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = xenopus)        
+write.csv(t2g, "xenopus_id2gene.csv")
+
+# t2g <- as.data.frame(fread("xenopus_id2gene.csv"))
+# t2g <- t2g[,-1] 
+
+# t2g <- fread("xenopus_auratus_t2g_data.csv")
+# t2g <- t2g[,-1]
+
+xen <- xenann[,c(1:2)]
+
+
+biggie <- dplyr::left_join(xen, t2g, by = "ensembl_peptide_id_version")
+
+#t2g <- biomaRt::getBM(attributes = c("ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = mart)
+biggie <- dplyr::rename(biggie, target_id = transcript_id,
+  ens_gene = ensembl_gene_id, ext_gene = external_gene_name)
+
+# so <- sleuth_prep(s2c, target_mapping = t2g)
+
+# so2g <- sleuth_prep(samples, target_mapping = biggie)
+
+
 # population
 # first prep the population matrix
 pop_design <- model.matrix(~0 + samples$morph)
@@ -73,7 +113,7 @@ colnames(pop_design) <- levels(samples$morph)
 
 
 
-sopop <- sleuth_prep(samples, full_model = pop_design, num_cores = 6)
+sopop <- sleuth_prep(samples, full_model = pop_design, num_cores = 6, target_mapping = biggie)
 
 sopop <- sleuth_fit(sopop, formula = pop_design, fit_name = "full")
 sopop <- sleuth_fit(sopop, formula = ~ 1, fit_name = "reduced")
@@ -84,11 +124,12 @@ sopop_lrt <- sleuth_lrt(sopop, "reduced", "full")
 # Ok I don't know why that doesn't actually work....
 
 pop_lrt_results <- sleuth_results(sopop_lrt, 'reduced:full', test_type = 'lrt')
-table(pop_lrt_results[,"qval"] < 0.05) #9701 significant transcripts between the null and the others...
+table(pop_lrt_results[,"qval"] < 0.05) #2,824 significant transcripts between the null and the others...
 pop_sig_results <-  pop_lrt_results[order(pop_lrt_results$qval),]
 pop_siggies <- pop_sig_results[ which(pop_sig_results$qval < 0.05),]
-
 ```
+
+
 
 Ok, 2,824 'significant' transcripts (statistically speaking). This is about 8.1% of transcripts. Now on to do some differential expression by candidate color genes, followed by some fancy shit like GO analyses. Now is probably a good time to attempt to learn that bullshit.
 
@@ -161,68 +202,7 @@ pc2 <- pc2[,-2]
 ```
 
 
-Next I'll use a Xenopus annotation and Biomart to look at gene expression and gene ontology analyses, particularly with targeted color genes. Forthis, I've already downloaded the appropriate data from BioMart. 
 
-### Note: I really should figure out a way to save these commands in a chunk that isn't run because it takes too long. I'm sure that is a thing in markdown.
-
-
-```{r}
-
-# First download the Xenopus annotation from linux/enrique
-xenann <- read.table("auratus2xenopus_tophit.txt", header = FALSE, fill = TRUE)
-colnames(xenann)[c(1:12)] <- c("transcript_id", "ensembl_peptide_id_version", "percentage_id_matches",
-                              "alignment_length", "number_mismatches", "number_gap_openings",
-                              "query_start", "query_end", "alignment_start", "alignment_end",
-                              "expected_value", "bitscore")
-
-ensembl=useMart("ensembl")
-xenopus <- useMart("ensembl", dataset = "xtropicalis_gene_ensembl")
-
-t2g <- biomaRt::getBM(attributes = c("ensembl_peptide_id_version", "ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = xenopus)        
-write.csv(t2g, "xenopus_id2gene.csv")
-
-# t2g <- as.data.frame(fread("xenopus_id2gene.csv"))
-# t2g <- t2g[,-1] 
-
-# t2g <- fread("xenopus_auratus_t2g_data.csv")
-# t2g <- t2g[,-1]
-
-xen <- xenann[,c(1:2)]
-
-
-biggie <- dplyr::left_join(xen, t2g, by = "ensembl_peptide_id_version")
-
-#t2g <- biomaRt::getBM(attributes = c("ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = mart)
-biggie <- dplyr::rename(biggie, target_id = transcript_id,
-  ens_gene = ensembl_gene_id, ext_gene = external_gene_name)
-
-# so <- sleuth_prep(s2c, target_mapping = t2g)
-
-# so2g <- sleuth_prep(samples, target_mapping = biggie)
-
-
-# population
-# first prep the population matrix
-pop_design <- model.matrix(~0 + samples$morph)
-colnames(pop_design) <- levels(samples$morph)
-
-
-
-sopop <- sleuth_prep(samples, full_model = pop_design, num_cores = 6, target_mapping = biggie)
-
-sopop <- sleuth_fit(sopop, formula = pop_design, fit_name = "full")
-sopop <- sleuth_fit(sopop, formula = ~ 1, fit_name = "reduced")
-#so <- sleuth_fit(so, full_model = spline_design)
-models(sopop)
-sopop_lrt <- sleuth_lrt(sopop, "reduced", "full")
-# so_wt <- sleuth_wt(so, "reduced", "full")
-# Ok I don't know why that doesn't actually work....
-
-pop_lrt_results <- sleuth_results(sopop_lrt, 'reduced:full', test_type = 'lrt')
-table(pop_lrt_results[,"qval"] < 0.05) #2,824 significant transcripts between the null and the others...
-pop_sig_results <-  pop_lrt_results[order(pop_lrt_results$qval),]
-pop_siggies <- pop_sig_results[ which(pop_sig_results$qval < 0.05),]
-```
 
 
 Get the significant ones, and only those that are classified as "genes" with an external gene name. I'm going to load this into GOrilla for now.
@@ -250,28 +230,25 @@ colors <-  colors[order(colors$qval),]
 # Drop color genes that don't have an associated transcript
 colors <- dplyr::filter(colors, target_id != "NA")
 
-
-##### This will iterate through and make a nice figure for each
-
- #color <- data.frame(transcripts = character(28), genes = character(28))
-#color$transcripts <- c("Transcript_23342","Transcript_68280")
+## These are just the 'statistically significant' hits
+sig_colors <- dplyr::filter(colors, qval < 0.05)
 
 
-#first make an empty dataframe
+
+##### This will iterate through and make a nice figure for each of the statistically significant color genes
 
 
-for (i in 1:nrow(colors)){
-  transcript <- colors[i,2]
-  gene <- colors[i,1]
-  qval <- colors[i,5]
+for (i in 1:nrow(sig_colors)){
+  transcript <- sig_colors[i,2]
+  gene <- sig_colors[i,1]
+  qval <- sig_colors[i,5]
   tmp <- sopop$obs_norm %>% dplyr::filter(target_id == transcript)  ### These are normalized values I think!
   tmp <- dplyr::full_join(sopop$sample_to_covariates, tmp, by = 'sample')
   tmp
   
   
-a <- ggplot(tmp, aes(x=morph, y=est_counts)) + geom_point(aes(size = 3, color = morph)) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(title = "Color morph", override.aes = list(size=4))) +  geom_smooth(method = loess) + ggtitle(paste0(gene, "\n(", transcript, "), q value = ", qval)) + guides(size=FALSE)
- 
- print(a)
+a <- ggplot(tmp, aes(x=morph, y=tpm)) + xlab("Morph") + ylab("Transcripts per million") + geom_point(aes(size = 3, color = morph)) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(title = "Color morph", override.aes = list(size=4))) +  geom_smooth(method = loess) + ggtitle(paste0(gene, "\n(", transcript, "), q value = ", qval)) + guides(size=FALSE)
+
  
   ggsave(paste0("colorgene-figures/", gene, "-", transcript, ".png"), width = 6.81, height = 3.99)
 }
