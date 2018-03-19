@@ -242,32 +242,9 @@ parallel -j 13 kallisto quant -i subsamp_auratus.idx -o kallisto_quants_combined
 # I've downloaded Xenopus tropicalis protein database into a file Xenopus_tropicalis.JGI_4.2.pep.all.fa
 # This is the ensembl 90 database, with x. tropicalis version jgi 4.2 
 # Data available from here: ftp://ftp.ensembl.org/pub/release-90/fasta/xenopus_tropicalis/pep/
-# I also downloaded a comma separated txt file from ensembl that provides:
-# xen gen id, xen transcript id, human gene id, human gene name, and % match to human gene
-# this data is in a file called: Xenopusgenes2Humangenes.txt
 # Data table downloaded from here: http://www.ensembl.org/biomart/martview/419a0bb8d13579a3c79229c7c1ddceb6
 
 
-# Now, I want to add the homo genes to this table, so here is the code I ran to do that.
-cat Xenopus_tropicalis.JGI_4.2.pep.all.fa | while read i
-  do
-  if [[ $i == \>* ]] 
-    then 
-      gene=
-      gene=$(echo $i | cut -d " " -f 4 | sed "s/gene://g" | cut -d "." -f 1)
-      result=
-      result=$(grep $gene Xenopusgenes2Humangenes.txt)
-      echo $i $result
-  else 
-    echo $i
-    fi >> X_tropicalis_JGI_4.2_pep_and_human.txt
-done
-
-# I also made one that was just the human gene then xenopus gene  to make things easier...code for that:
-# cat Xenopusgenes2Humangenes.txt | awk -v OFS="," -F "," '{print $3,$1}' > humangene2xenopusgeneonly.txt
-
-cat Xenopus_tropicalis.JGI_4.2.pep.all.fa | while read i; do   if [[ $i == \>* ]] ; then  gene=;  gene=$(echo $i | cut -d " " -f 4 | sed "s/gene://g" | cut -d "." -f 1);       result=;\
-result=$(grep $gene humangene2xenopusgeneonly.txt); printf "> %s %s" "$result" "$i"; else      echo $i;     fi >> human2x-tropicalis.txt; done
 
 #Annotate with diamond, which first requires building a blast database:
 diamond makedb --in X_tropicalis_JGI_4.2_pep_and_human.txt -d subsamp
@@ -276,12 +253,20 @@ diamond makedb --in X_tropicalis_JGI_4.2_pep_and_human.txt -d subsamp
 diamond blastx -d subsamp -q auratus.subsampled.fasta -o auratus2xenopus.m8 --threads 16 \
 -f 6 salltitles qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore
 
-diamond blastx -d subsamp -q subsamp.orthomerged.fasta.dammit.fasta -o subsampmatches2.m8 --threads 16 \
-## Gets a more informative table: -f 6 qseqid salltitles pident length mismatch gapopen qstart qend sstart send evalue bitscore
 
+# Do the same for the NR protein database from NCBI
+diamond makedb --in /home/summersk/blast_nr/nr.fa -d nrdiamondbase
+diamond blastx -d nrdiamondbase -q annotated.auratus.fasta -o auratusNR.m8 --threads 32 
 
-### I can limit the number of hits with "--max-target-seqs"; default is 25.
-## An alternative is to do it after the fact in R by percentage, or evalue
-## Another alternative is to do it in bash
-awk '$5 > 95' out.m8 >> newfile.txt    ##### filters the table by the values in column 5, only keeps things greater than 95
+# sort by tophit
+sort auratusNR.m8 -k 1,1 -k11,11rg | sort -u -k 1,1 --merge > auratusNR_tophit.txt
 
+## bullfrog
+diamond makedb --in /home/summersk/blat_databases/bullfrog/GCA_002284835.2_RCv2.1_protein.faa -d bullfrogdb
+diamond blastx -d bullfrogdb -q annotated.auratus.fasta -o auratus2bullfrog.m8 --threads 32 
+sort auratus2bullfrog.m8 -k 1,1 -k11,11rg | sort -u -k 1,1 --merge > auratus2bullfrog_tophit.txt
+
+## Concatenate all of the  annotation files together...
+cat auratus2xenopus_tophit.txt auratus2bullfrog_tophit.txt auratusNR_tophit.txt > full_annotation_file.txt
+
+sort full_annotation_file.txt -k 1,1 -k11,11rg | sort -u -k 1,1 --merge > full_annotation_tophit.txt
