@@ -1,0 +1,366 @@
+"","ext_gene","description"
+"1","abhd11","abhydrolase domain containing 11 (abhd11), mRNA [Source:RefSeq mRNA;Acc:NM_001128647]"
+"2","Acd",NA
+"3","adam17","ADAM metallopeptidase domain 17 (adam17), mRNA [Source:RefSeq mRNA;Acc:NM_001195230]"
+"4","adamts20","ADAM metallopeptidase with thrombospondin type 1 motif 20 [Source:Xenbase;Acc:XB-GENE-949936]"
+"5","Adrb2",NA
+"6","agouti",NA
+"7","agrp",NA
+"8","aldoaa",NA
+"9","alyron",NA
+"10","aox3",NA
+"11","ap3b1",NA
+"12","ap3d1","adaptor related protein complex 3 delta 1 subunit [Source:Xenbase;Acc:XB-GENE-494144]"
+"13","ap3d1","adaptor related protein complex 3 delta 1 subunit [Source:Xenbase;Acc:XB-GENE-494144]"
+"14","apc","adenomatous polyposis coli [Source:Xenbase;Acc:XB-GENE-480855]"
+"15","Arcn1",NA
+"16","arl6","ADP ribosylation factor like GTPase 6 [Source:Xenbase;Acc:XB-GENE-940504]"
+"17","asip",NA
+"18","ASIP",NA
+"19","atoh7","atonal bHLH transcription factor 7 [Source:Xenbase;Acc:XB-GENE-989022]"
+"20","atox1","antioxidant 1 copper chaperone [Source:Xenbase;Acc:XB-GENE-947767]"
+"21","atp6ap1",NA
+"22","atp6ap2","ATPase, H+ transporting, lysosomal accessory protein 2 [Source:Xenbase;Acc:XB-GENE-964301]"
+"23","atp6v0c","ATPase, H+ transporting, lysosomal 16kDa, V0 subunit c (atp6v0c), mRNA [Source:RefSeq mRNA;Acc:NM_203562]"
+"24","atp6v0d1","ATPase, H+ transporting, lysosomal 38kDa, V0 subunit d1 [Source:Xenbase;Acc:XB-GENE-989918]"
+"25","atp6v0d1","ATPase, H+ transporting, lysosomal 38kDa, V0 subunit d1 [Source:Xenbase;Acc:XB-GENE-989918]"
+"26","atp6v1e1","ATPase, H+ transporting, lysosomal 31kDa, V1 subunit E1 [Source:Xenbase;Acc:XB-GENE-1006142]"
+"27","atp6v1e1","ATPase, H+ transporting, lysosomal 31kDa, V1 subunit E1 [Source:Xenbase;Acc:XB-GENE-1006142]"
+"28","atp6v1f","ATPase, H+ transporting, lysosomal 14kDa, V1 subunit F (atp6v1f), mRNA [Source:RefSeq mRNA;Acc:NM_001004928]"
+"29","atp6v1h","ATPase, H+ transporting, lysosomal 50/57kDa, V1 subunit H (atp6v1h), mRNA [Source:RefSeq mRNA;Acc:NM_001016182]"
+"30","atp6v0c","ATPase, H+ transporting, lysosomal 16kDa, V0 subunit c (atp6v0c), mRNA [Source:RefSeq mRNA;Acc:NM_203562]"
+"31","atp7a",NA
+"32","atp7b","ATPase, Cu++ transporting, beta polypeptide [Source:Xenbase;Acc:XB-GENE-6044681]"
+"33","atrn","attractin [Source:Xenbase;Acc:XB-GENE-953934]"
+"34","bbip1",NA
+"35","bbs1","Bardet-Biedl syndrome 1 (bbs1), mRNA [Source:RefSeq mRNA;Acc:NM_001122804]"
+"36","bbs2","Bardet-Biedl syndrome 2 [Source:Xenbase;Acc:XB-GENE-921947]"
+"37","bbs4","Bardet-Biedl syndrome 4 [Source:Xenbase;Acc:XB-GENE-952107]"
+"38","bbs4","Bardet-Biedl syndrome 4 [Source:Xenbase;Acc:XB-GENE-952107]"
+"39","bbs5","Bardet-Biedl syndrome 5 [Source:Xenbase;Acc:XB-GENE-965964]"
+"40","bbs7",NA
+"41","Bcl2",NA
+"42","Bmpr1a",NA
+"43","Bmpr1b",NA
+"44","bnc2","basonuclin 2 [Source:Xenbase;Acc:XB-GENE-953157]"
+"45","BCD02",NA
+"46","Bloc1s3",NA
+"47","Brca1",NA
+"48","c13h10",NA
+"49","c-ski1",NA
+"50","cAMP",NA
+"51","Casp3",NA
+"52","cct2","chaperonin containing TCP1 subunit 2 [Source:Xenbase;Acc:XB-GENE-1006535]"
+"53","cct2","chaperonin containing TCP1 subunit 2 [Source:Xenbase;Acc:XB-GENE-1006535]"
+"54","cdh2","cadherin 2, type 1, N-cadherin (neuronal) [Source:Xenbase;Acc:XB-GENE-951659]"
+"55","cd3612",NA
+"56","chm","choroideremia (Rab escort protein 1) [Source:Xenbase;Acc:XB-GENE-956389]"
+"57","Cited1",NA
+"58","cno",NA
+"59","creb1","cAMP responsive element binding protein 1 (creb1), mRNA [Source:RefSeq mRNA;Acc:NM_213686]"
+"60","csf1",NA
+"61","csf1r","colony stimulating factor 1 receptor (csf1r), mRNA [Source:RefSeq mRNA;Acc:NM_001008180]"
+"62","csf1r","colony stimulating factor 1 receptor (csf1r), mRNA [Source:RefSeq mRNA;Acc:NM_001008180]"
+"63","ctbp2a",NA
+"64","ctr9","CTR9 homolog, Paf1/RNA polymerase II complex component [Source:Xenbase;Acc:XB-GENE-5946075]"
+"65","ctr9","CTR9 homolog, Paf1/RNA polymerase II complex component [Source:Xenbase;Acc:XB-GENE-5946075]"
+"66","Cx41.8",NA
+"67","dac",NA
+"68","dct","dopachrome tautomerase (dct), mRNA [Source:RefSeq mRNA;Acc:NM_001017161]"
+"69","Dgfr",NA
+"70","Dio2",NA
+"71","Dph1",NA
+"72","Dock7",NA
+"73","drd2","dopamine receptor D2 [Source:Xenbase;Acc:XB-GENE-1005779]"
+"74","Dst",NA
+"75","dtnbp1","dystrobrevin binding protein 1 [Source:Xenbase;Acc:XB-GENE-5812147]"
+"76","dtnbp1","dystrobrevin binding protein 1 [Source:Xenbase;Acc:XB-GENE-5812147]"
+"77","ebna1bp2","EBNA1 binding protein 2 [Source:Xenbase;Acc:XB-GENE-998147]"
+"78","ece1","endothelin converting enzyme 1 [Source:Xenbase;Acc:XB-GENE-1014218]"
+"79","ece2b",NA
+"80","eda",NA
+"81","Edar",NA
+"82","Edaradd",NA
+"83","Edn3",NA
+"84","Eed",NA
+"85","Egfr",NA
+"86","end",NA
+"87","ednrb1",NA
+"88","ednrb2","endothelin receptor B subtype 2 (ednrb2), mRNA [Source:RefSeq mRNA;Acc:NM_001079208]"
+"89","ednrb2","endothelin receptor B subtype 2 (ednrb2), mRNA [Source:RefSeq mRNA;Acc:NM_001079208]"
+"90","egfr","epidermal growth factor receptor [Source:Xenbase;Acc:XB-GENE-6067152]"
+"91","eif3ea",NA
+"92","Elovl3",NA
+"93","Elovl4",NA
+"94","en1","engrailed homeobox 1 [Source:Xenbase;Acc:XB-GENE-5737237]"
+"95","erbb3","erb-b2 receptor tyrosine kinase 3 [Source:Xenbase;Acc:XB-GENE-853369]"
+"96","erbb3b",NA
+"97","Ercc2",NA
+"98","esrom",NA
+"99","ex41.8",NA
+"100","Fas",NA
+"101","fbxw4","F-box and WD repeat domain containing 4 [Source:Xenbase;Acc:XB-GENE-852986]"
+"102","fgfr2","fibroblast growth factor receptor 2 (fgfr2), mRNA [Source:RefSeq mRNA;Acc:NM_001102856]"
+"103","fig4",NA
+"104","fl1",NA
+"105","fms",NA
+"106","foxd1","forkhead box D1 [Source:Xenbase;Acc:XB-GENE-488077]"
+"107","foxd2","forkhead box D2 [Source:Xenbase;Acc:XB-GENE-479818]"
+"108","foxd3","forkhead box D3 (foxd3), mRNA [Source:RefSeq mRNA;Acc:NM_001011383]"
+"109","Foxd3",NA
+"110","Foxd5",NA
+"111","Foxn1",NA
+"112","frem2","FRAS1 related extracellular matrix protein 2 [Source:Xenbase;Acc:XB-GENE-1004431]"
+"113","fzd4","frizzled class receptor 4 [Source:Xenbase;Acc:XB-GENE-478210]"
+"114","gart","phosphoribosylglycinamide formyltransferase, phosphoribosylglycinamide synthetase, phosphoribosylaminoimidazole synthetase [Source:Xenbase;Acc:XB-GENE-993017]"
+"115","Gas1",NA
+"116","Gata3",NA
+"117","gchfr","GTP cyclohydrolase I feedback regulator (gchfr), mRNA [Source:RefSeq mRNA;Acc:NM_213715]"
+"118","gchIa",NA
+"119","gchIb",NA
+"120","gfpt1","glutamine--fructose-6-phosphate transaminase 1 [Source:Xenbase;Acc:XB-GENE-493902]"
+"121","Ggt1",NA
+"122","ghr","growth hormone receptor [Source:Xenbase;Acc:XB-GENE-481436]"
+"123","gja5","gap junction protein alpha 5 [Source:Xenbase;Acc:XB-GENE-490481]"
+"124","Gli3",NA
+"125","gna11","guanine nucleotide binding protein (G protein), alpha 11 (Gq class) (gna11), mRNA [Source:RefSeq mRNA;Acc:NM_203819]"
+"126","gnaq","guanine nucleotide binding protein (G protein), q polypeptide (gnaq), mRNA [Source:RefSeq mRNA;Acc:NM_001044517]"
+"127","Gnpat",NA
+"128","gpc3",NA
+"129","gpnmb","glycoprotein (transmembrane) nmb (gpnmb), mRNA [Source:RefSeq mRNA;Acc:NM_001131042]"
+"130","gpr143","G protein-coupled receptor 143 (gpr143), mRNA [Source:RefSeq mRNA;Acc:NM_001011018]"
+"131","gpr143","G protein-coupled receptor 143 (gpr143), mRNA [Source:RefSeq mRNA;Acc:NM_001011018]"
+"132","gpr161","G protein-coupled receptor 161 (gpr161), mRNA [Source:RefSeq mRNA;Acc:NM_001130376]"
+"133","gpr161","G protein-coupled receptor 161 (gpr161), mRNA [Source:RefSeq mRNA;Acc:NM_001130376]"
+"134","Grlf1",NA
+"135","gtp-ch",NA
+"136","hdac1","histone deacetylase 1 [Source:Xenbase;Acc:XB-GENE-479583]"
+"137","Hells",NA
+"138","Heph",NA
+"139","herc2","HECT and RLD domain containing E3 ubiquitin protein ligase 2 [Source:Xenbase;Acc:XB-GENE-1012659]"
+"140","hipk2","homeodomain interacting protein kinase 2 [Source:Xenbase;Acc:XB-GENE-958494]"
+"141","hps1",NA
+"142","hps3","Hermansky-Pudlak syndrome 3 [Source:Xenbase;Acc:XB-GENE-854022]"
+"143","hps4","Hermansky-Pudlak syndrome 4 protein  [Source:RefSeq peptide;Acc:NP_001072472]"
+"144","hps4","Hermansky-Pudlak syndrome 4 protein  [Source:RefSeq peptide;Acc:NP_001072472]"
+"145","hps4","Hermansky-Pudlak syndrome 4 protein  [Source:RefSeq peptide;Acc:NP_001072472]"
+"146","hps5","Hermansky-Pudlak syndrome 5 [Source:Xenbase;Acc:XB-GENE-5931110]"
+"147","hps5","Hermansky-Pudlak syndrome 5 [Source:Xenbase;Acc:XB-GENE-5931110]"
+"148","hps6","Hermansky-Pudlak syndrome 6 [Source:Xenbase;Acc:XB-GENE-854592]"
+"149","ift27","intraflagellar transport 27 (ift27), mRNA [Source:RefSeq mRNA;Acc:NM_001142001]"
+"150","igsf11","immunoglobulin superfamily member 11 [Source:Xenbase;Acc:XB-GENE-953808]"
+"151","Ihh",NA
+"152","ikbkg","inhibitor of kappa light polypeptide gene enhancer in B-cells, kinase gamma (ikbkg), mRNA [Source:RefSeq mRNA;Acc:NM_001126749]"
+"153","inpp5b","inositol polyphosphate-5-phosphatase B [Source:Xenbase;Acc:XB-GENE-6046792]"
+"154","inpp5e",NA
+"155","ippk","inositol-pentakisphosphate 2-kinase (ippk), mRNA [Source:RefSeq mRNA;Acc:NM_001079280]"
+"156","irf4","interferon regulatory factor 4 [Source:Xenbase;Acc:XB-GENE-988321]"
+"157","itgb1","integrin subunit beta 1 (itgb1), mRNA [Source:RefSeq mRNA;Acc:NM_203829]"
+"158","itk",NA
+"159","Jmjd6",NA
+"160","kcnj13","potassium channel, inwardly rectifying subfamily J, member 13 (kcnj13), mRNA [Source:RefSeq mRNA;Acc:NM_001102967]"
+"161","kit","mast/stem cell growth factor receptor Kit precursor  [Source:RefSeq peptide;Acc:NP_001135545]"
+"162","kit","mast/stem cell growth factor receptor Kit precursor  [Source:RefSeq peptide;Acc:NP_001135545]"
+"163","kit","v-kit Hardy-Zuckerman 4 feline sarcoma viral oncogene homolog [Source:Xenbase;Acc:XB-GENE-492512]"
+"164","kita",NA
+"165","kitl",NA
+"166","KITLG",NA
+"167","Krt1",NA
+"168","Krt17",NA
+"169","Krt2",NA
+"170","Krt4",NA
+"171","Krt75",NA
+"172","L1cam",NA
+"173","lef1","lymphoid enhancer-binding factor 1 [Source:Xenbase;Acc:XB-GENE-485517]"
+"174","leo1","LEO1 homolog, Paf1/RNA polymerase II complex component [Source:Xenbase;Acc:XB-GENE-5828183]"
+"175","lmx1a","LIM homeobox transcription factor 1, alpha [Source:Xenbase;Acc:XB-GENE-481569]"
+"176","ltk",NA
+"177","lyst","lysosomal trafficking regulator [Source:Xenbase;Acc:XB-GENE-1012150]"
+"178","lyst","lysosomal trafficking regulator [Source:Xenbase;Acc:XB-GENE-1012150]"
+"179","Mab21l2",NA
+"180","Map2k1",NA
+"181","mbtps1","membrane bound transcription factor peptidase, site 1 (mbtps1), mRNA [Source:RefSeq mRNA;Acc:NM_001079323]"
+"182","mc1r",NA
+"183","Mc1r",NA
+"184","Mc2r",NA
+"185","Mc3r",NA
+"186","Mc4r",NA
+"187","Mc5r",NA
+"188","Mchr1",NA
+"189","mcoln3","mucolipin 3 (mcoln3), mRNA [Source:RefSeq mRNA;Acc:NM_001016804]"
+"190","Med1",NA
+"191","med12",NA
+"192","meox1",NA
+"193","mf41",NA
+"194","mgrn1","mahogunin ring finger 1, E3 ubiquitin protein ligase [Source:Xenbase;Acc:XB-GENE-963240]"
+"195","mgrn1","mahogunin ring finger 1, E3 ubiquitin protein ligase [Source:Xenbase;Acc:XB-GENE-963240]"
+"196","mib1","mindbomb E3 ubiquitin protein ligase 1 (mib1), mRNA [Source:RefSeq mRNA;Acc:NM_001129935]"
+"197","mib1","mindbomb E3 ubiquitin protein ligase 1 (mib1), mRNA [Source:RefSeq mRNA;Acc:NM_001129935]"
+"198","mitf","microphthalmia-associated transcription factor [Source:Xenbase;Acc:XB-GENE-484962]"
+"199","mitf","microphthalmia-associated transcription factor [Source:Xenbase;Acc:XB-GENE-484962]"
+"200","Mitfa",NA
+"201","mitfb",NA
+"202","mlph","melanophilin  [Source:RefSeq peptide;Acc:NP_001120194]"
+"203","mlph","melanophilin  [Source:RefSeq peptide;Acc:NP_001120194]"
+"204","MLPH",NA
+"205","Mpzl3",NA
+"206","mreg","melanoregulin (mreg), mRNA [Source:RefSeq mRNA;Acc:NM_001016432]"
+"207","myc","v-myc avian myelocytomatosis viral oncogene homolog (myc), mRNA [Source:RefSeq mRNA;Acc:NM_204059]"
+"208","mycbp2","MYC binding protein 2, E3 ubiquitin protein ligase [Source:Xenbase;Acc:XB-GENE-998752]"
+"209","myo5a","myosin VA [Source:Xenbase;Acc:XB-GENE-1004102]"
+"210","myo7a","myosin 7a [Source:Xenbase;Acc:XB-GENE-494060]"
+"211","Ndp",NA
+"212","Nf1",NA
+"213","Notch1",NA
+"214","Nr2e1",NA
+"215","nrapa",NA
+"216","nsfa",NA
+"217","nsf","N-ethylmaleimide sensitive factor (nsf), mRNA [Source:RefSeq mRNA;Acc:NM_001079320]"
+"218","nsf","N-ethylmaleimide sensitive factor (nsf), mRNA [Source:RefSeq mRNA;Acc:NM_001079320]"
+"219","Ntrk1",NA
+"220","OA1",NA
+"221","Oat",NA
+"222","oca2","oculocutaneous albinism II [Source:Xenbase;Acc:XB-GENE-989255]"
+"223","ocrl",NA
+"224","OPN1",NA
+"225","OPN1LW",NA
+"226","OPN1MW",NA
+"227","OPN1SW",NA
+"228","Ostm1",NA
+"229","Otx2",NA
+"230","Ovol1",NA
+"231","p53",NA
+"232","pabpc1","poly(A) binding protein, cytoplasmic 1 (pabpc1), mRNA [Source:RefSeq mRNA;Acc:NM_001005051]"
+"233","pabpc1","poly(A) binding protein, cytoplasmic 1 (pabpc1), mRNA [Source:RefSeq mRNA;Acc:NM_001005051]"
+"234","Pah",NA
+"235","paics",NA
+"236","pax2","paired box 2 (pax2), mRNA [Source:RefSeq mRNA;Acc:NM_001044423]"
+"237","pax2","paired box 2 (pax2), mRNA [Source:RefSeq mRNA;Acc:NM_001044423]"
+"238","Pax3",NA
+"239","Pax6",NA
+"240","pax7a",NA
+"241","Pax7b",NA
+"242","pcbd1","pterin-4 alpha-carbinolamine dehydratase/dimerization cofactor of hepatocyte nuclear factor 1 alpha (pcbd1), mRNA [Source:RefSeq mRNA;Acc:NM_001011016]"
+"243","pcbd2",NA
+"244","Pdgfb",NA
+"245","Pdgfc",NA
+"246","pdgfrk",NA
+"247","Pdpk1",NA
+"248","Phactr4",NA
+"249","pkc",NA
+"250","Pitx3",NA
+"251","pldn",NA
+"252","Pmel",NA
+"253","pmela",NA
+"254","Pmch",NA
+"255","Pnp",NA
+"256","Polg",NA
+"257","Polh",NA
+"258","pomc","proopiomelanocortin (pomc), mRNA [Source:RefSeq mRNA;Acc:NM_001011318]"
+"259","Pomca",NA
+"260","Pp2b",NA
+"261","Pph4",NA
+"262","Psen1",NA
+"263","pts",NA
+"264","Pygo1",NA
+"265","qdpr","quinoid dihydropteridine reductase (qdpr), mRNA [Source:RefSeq mRNA;Acc:NM_001011492]"
+"266","rab11a","RAB11A, member RAS oncogene family (rab11a), mRNA [Source:RefSeq mRNA;Acc:NM_001016481]"
+"267","rab11bb",NA
+"268","rab25a",NA
+"269","rab27a","RAB27A, member RAS oncogene family (rab27a), mRNA [Source:RefSeq mRNA;Acc:NM_001007969]"
+"270","rab32","RAB32, member RAS oncogene family (rab32), mRNA [Source:RefSeq mRNA;Acc:NM_001011276]"
+"271","Rab38",NA
+"272","Rabggta",NA
+"273","Rabin3",NA
+"274","Rb1",NA
+"275","Rbp1",NA
+"276","Rbpj",NA
+"277","Recql4",NA
+"278","Rs1",NA
+"279","Rh0",NA
+"280","Rh1",NA
+"281","Ric8b",NA
+"282","rpl24","ribosomal protein L24 [Source:Xenbase;Acc:XB-GENE-963922]"
+"283","rps19","ribosomal protein S19 [Source:Xenbase;Acc:XB-GENE-968799]"
+"284","rps20","RNA binding motif protein 6 (rbm6), mRNA [Source:RefSeq mRNA;Acc:NM_001005106]"
+"285","rtf1","RTF1 homolog, Paf1/RNA polymerase II complex component (rtf1), mRNA [Source:RefSeq mRNA;Acc:NM_001005068]"
+"286","rtf1","RTF1 homolog, Paf1/RNA polymerase II complex component (rtf1), mRNA [Source:RefSeq mRNA;Acc:NM_001005068]"
+"287","Rxra",NA
+"288","S1pr2",NA
+"289","scarb2","scavenger receptor class B member 2 (scarb2), mRNA [Source:RefSeq mRNA;Acc:NM_001016557]"
+"290","Sema3c",NA
+"291","Sema4a",NA
+"292","sf3b1","splicing factor 3b subunit 1 [Source:Xenbase;Acc:XB-GENE-959867]"
+"293","sfxn1","sideroflexin 1 [Source:Xenbase;Acc:XB-GENE-970145]"
+"294","sfxn1","sideroflexin 1 [Source:Xenbase;Acc:XB-GENE-970145]"
+"295","Shroom2",NA
+"296","Si",NA
+"297","silver",NA
+"298","skiv2l2",NA
+"299","SL",NA
+"300","Sla",NA
+"301","slc24a4","solute carrier family 24 (sodium/potassium/calcium exchanger), member 4 [Source:Xenbase;Acc:XB-GENE-478288]"
+"302","slc24a5","solute carrier family 24 (sodium/potassium/calcium exchanger), member 5 [Source:Xenbase;Acc:XB-GENE-853669]"
+"303","SLC24a5",NA
+"304","Slc31a1",NA
+"305","slc45a2","solute carrier family 45 member 2 (slc45a2), mRNA [Source:RefSeq mRNA;Acc:NM_001011335]"
+"306","Slc7a11",NA
+"307","Smarca5",NA
+"308","smtl",NA
+"309","snai2","snail family zinc finger 2 (snai2), mRNA [Source:RefSeq mRNA;Acc:NM_204093]"
+"310","Sox10",NA
+"311","sox18",NA
+"312","sox9","SRY-box 9 [Source:Xenbase;Acc:XB-GENE-1034769]"
+"313","sox9b",NA
+"314","Sox10",NA
+"315","spr",NA
+"316","Spr",NA
+"317","Sr",NA
+"318","Sufu",NA
+"319","Sulf1",NA
+"320","Tbx10",NA
+"321","Tbx15",NA
+"322","Tcfap2a",NA
+"323","tfap2a","transcription factor AP-2 alpha (activating enhancer binding protein 2 alpha) (tfap2a), mRNA [Source:RefSeq mRNA;Acc:NM_001037258]"
+"324","tfap2a","transcription factor AP-2 alpha (activating enhancer binding protein 2 alpha) (tfap2a), mRNA [Source:RefSeq mRNA;Acc:NM_001037258]"
+"325","tfap2a","transcription factor AP-2 alpha (activating enhancer binding protein 2 alpha) (tfap2a), mRNA [Source:RefSeq mRNA;Acc:NM_001037258]"
+"326","tfap2c","transcription factor AP-2 gamma (activating enhancer binding protein 2 gamma) (tfap2c), mRNA [Source:RefSeq mRNA;Acc:NM_001011093]"
+"327","Timp3",NA
+"328","tpcn2",NA
+"329","TPH1",NA
+"330","TPH2","tryptophan hydroxylase 2 [Source:HGNC Symbol;Acc:HGNC:20692]"
+"331","Traf6",NA
+"332","Trappc6a",NA
+"333","trim33","tripartite motif containing 33 [Source:Xenbase;Acc:XB-GENE-1216165]"
+"334","trim32","tripartite motif containing 32 (trim32), mRNA [Source:RefSeq mRNA;Acc:NM_001102923]"
+"335","TRP1",NA
+"336","TRP2",NA
+"337","trpm1","transient receptor potential cation channel, subfamily M, member 1 [Source:Xenbase;Acc:XB-GENE-492528]"
+"338","trpm7","transient receptor potential cation channel, subfamily M, member 7 [Source:Xenbase;Acc:XB-GENE-486884]"
+"339","ttc8","tetratricopeptide repeat domain 8 [Source:Xenbase;Acc:XB-GENE-1000122]"
+"340","ttc8","tetratricopeptide repeat domain 8 [Source:Xenbase;Acc:XB-GENE-1000122]"
+"341","Tub",NA
+"342","txndc5","thioredoxin domain containing 5 (txndc5), mRNA [Source:RefSeq mRNA;Acc:NM_203855]"
+"343","tyr","tyrosinase (tyr), mRNA [Source:RefSeq mRNA;Acc:NM_001103048]"
+"344","tyrp1","tyrosinase-related protein 1 (tyrp1), mRNA [Source:RefSeq mRNA;Acc:NM_001016476]"
+"345","tyrp1a",NA
+"346","tyrp1b",NA
+"347","Trp2",NA
+"348","Unc119",NA
+"349","Vldlr",NA
+"350","vps11","VPS11, CORVET/HOPS core subunit [Source:Xenbase;Acc:XB-GENE-922526]"
+"351","vps11","VPS11, CORVET/HOPS core subunit [Source:Xenbase;Acc:XB-GENE-922526]"
+"352","vps18","VPS18, CORVET/HOPS core subunit (vps18), mRNA [Source:RefSeq mRNA;Acc:NM_001127982]"
+"353","vps33a",NA
+"354","vps39","VPS39 HOPS complex subunit (vps39), mRNA [Source:RefSeq mRNA;Acc:NM_001142157]"
+"355","vps39","VPS39 HOPS complex subunit (vps39), mRNA [Source:RefSeq mRNA;Acc:NM_001142157]"
+"356","Vsx2",NA
+"357","wnt1","wingless-type MMTV integration site family member 1 [Source:Xenbase;Acc:XB-GENE-485280]"
+"358","wnt3a","wingless-type MMTV integration site family member 3A [Source:Xenbase;Acc:XB-GENE-1217288]"
+"359","wt",NA
+"360","xdh","xanthine dehydrogenase [Source:Xenbase;Acc:XB-GENE-956800]"
+"361","xod",NA
+"362","Zbtb17",NA
+"363","Zfp53",NA
+"364","zic2","Zic family member 2 (zic2), mRNA [Source:RefSeq mRNA;Acc:NM_001017025]"
+"365","zic2","Zic family member 2 (zic2), mRNA [Source:RefSeq mRNA;Acc:NM_001017025]"
