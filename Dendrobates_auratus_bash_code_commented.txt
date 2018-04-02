@@ -82,142 +82,7 @@ mv subsamp.orthomerged.fasta auratus.subsampled.fasta
 
 ## Build a random transcriptome for each different color morph, then merge them all together.
 
-##########CODE TO MERGE THE FIRST AND SECOND LANES#############
-
-####RANDOMLY CHOSE ONE INDIVIDUAL PER MORPH###########
-
-/home/summersk/programs/Oyster_River_Protocol/oyster.mk main \
-MEM=1250 \
-CPU=28 \
-READ1=Blue-Black1.R1.fastq \
-READ2=Blue-Black1.R2.fastq \
-RUNOUT=Blue-Black1
-
-/home/summersk/programs/Oyster_River_Protocol/oyster.mk main \
-MEM=1250 \
-CPU=28 \
-READ1=Microspot2.R1.fastq \
-READ2=Microspot2.R2.fastq \
-RUNOUT=Microspot2
-
-/home/summersk/programs/Oyster_River_Protocol/oyster.mk main \
-MEM=1250 \
-CPU=28 \
-READ1=San-Felix2.R1.fastq \
-READ2=San-Felix2.R2.fastq \
-RUNOUT=San-Felix2
-
-/home/summersk/programs/Oyster_River_Protocol/oyster.mk main \
-MEM=1250 \
-CPU=28 \
-READ1=Super-Blue1.R1.fastq \
-READ2=Super-Blue1.R2.fastq \
-RUNOUT=Super-Blue1
-
-####MOVE THE ASSEMBLED TRANSCRIPTOMES INTO A COMMON FOLDER#####
-
-#######RENAME TRANSCRIPTS TO WORK WTIH ORTHOFUSER##########
-
-awk '/^>/{print ">Blue-Black1_" ++i; next}{print}'  Blue-Black1.orthomerged.fixed.fasta > Blue-Black1.orthomerged.renamed.fasta
-
-awk '/^>/{print ">Microspot2_" ++i; next}{print}'  Microspot2.orthomerged.fixed.fasta > Microspot2.orthomerged.renamed.fasta
-
-awk '/^>/{print ">San-Felix2_" ++i; next}{print}'  San-Felix2.orthomerged.fixed.fasta > San-Felix2.orthomerged.renamed.fasta
-
-awk '/^>/{print ">Super-Blue1_" ++i; next}{print}'  Super-Blue1.orthomerged.fixed.fasta > Super-Blue1.orthomerged.renamed.fasta
-
-
-#####combine other reads into one big one, also clean all the reads####
-Cat *R1.fq > all_reads_R1.fastq
-Cat *R2.fq > all_reads_R2.fastq
-
-(ls all_reads_R* | sed "s/_R1.fastq//g" | sed "s/_R2.fastq//g" ) | \
-parallel -j 10 trimmomatic-0.36.jar PE -threads 4 \
--baseout rcorr/{}_TRIM.fastq {}_R1.fastq {}_R2.fastq \
-LEADING:3 TRAILING:3 ILLUMINACLIP:barcodes.fa:2:30:10 MINLEN:25 
-
-# Then run R corrector
-(ls all_reads_R* | sed "s/_R1.fastq//g" | sed "s/_R2.fastq//g" | uniq) | \
-parallel -j 10 run_rcorrector.pl -t 10 -k 31 -1 rcorr/{}_TRIM_1P.fastq -2 rcorr/{}_TRIM_2P.fastq -od rcorr
-
-
-
-####### Merge all the assemblies into a single transcriptome using orthofuser
-
-/home/summersk/programs/Oyster_River_Protocol/orthofuser.mk all \
-READ1=rcorr/all_reads_TRIM_1P.cor.fq \
-READ2=rcorr/all_reads_TRIM_2P.cor.fq \
-CPU=30 RUNOUT=ortho_merged \
-FASTADIR=orthomerged_fastas/ LINEAGE=eukaryota_odb9
-
-####### Calculate BUSCO and transrate scores for the full dataset
-
-/home/summersk/programs/mod_Oyster_River_Protocol/software/orp-transrate/transrate \
--o /home/summersk/auratus/reports/transrate_assembly-reads  \
--a /home/summersk/auratus/auratus.merged.fasta \
---left /home/summersk/auratus/corrected_assembly_reads_R1.fq \
---right /home/summersk/auratus/corrected_assembly_reads_R2.fq \
--t 30
-
-python /home/summersk/programs/busco/scripts/run_BUSCO.py -i /home/summersk/auratus/good.auratus.merged.fasta -m transcriptome --cpu 24 -l /home/summersk/busco_dbs/eukaryota_odb9 -o /home/summersk/auratus/good_busco
-
-# Scores were really atrocious for transrate, so we are going to use only the 'good' fasta scores from it.
-
-### Move the 'good' fasta into the main directory and rename it
-cp orthofuse/ortho_merged/merged/merged/good.merged.fasta .
-mv good.merged.fasta good.auratus.merged.fasta
-
-# Annotate the transcriptome using dammit
-# first create the databases
-#SO, this program is hiccupy--and the version on git does not work. I've installed the developer's version (1.0) which works
-# Installation instructions are here: http://angus.readthedocs.io/en/2017/dammit_annotation.html
-# Move to a python3 environment
-. ~/py3/bin/activate
-
-# install databases
-dammit databases --install --full
-
-# Then run the annotation
-dammit annotate good.auratus.merged.fasta --full --busco-group metazoa --n_threads 28
-
-# unzip all the files
-parallel -j 54 gunzip {} ::: *.fastq.gz
-
-# This will list all the samples
-samples=$(ls *fastq | sed "s/_R1.fastq//g" | sed "s/_R2.fastq//g" | uniq | grep -v subsamp | grep -v all_reads)
-
-
-# Remove adaptors and trim the reads from each sample
-# First run trimmomatic
-
-(ls *fastq | sed "s/_R1.fastq//g" | sed "s/_R2.fastq//g" | uniq | grep -v subsamp | grep -v all_reads) | \
-parallel -j 10 trimmomatic-0.36.jar PE -threads 4 \
--baseout rcorr/{}_TRIM.fastq {}_R1.fastq {}_R2.fastq \
-LEADING:3 TRAILING:3 ILLUMINACLIP:barcodes.fa:2:30:10 MINLEN:25 
-
-# Then run R corrector
-(ls *fastq | sed "s/_R1.fastq//g" | sed "s/_R2.fastq//g" | uniq | grep -v subsamp | grep -v all_reads) | \
-parallel -j 10 run_rcorrector.pl -t 10 -k 31 -1 rcorr/{}_TRIM_1P.fastq -2 rcorr/{}_TRIM_2P.fastq -od rcorr
-
-## Move the annotated dammit fasta...
-
-
-# Pseudo-quantification with kallisto, build the index first
-kallisto index -i subsamp_auratus.idx annotated.auratus.fasta
-
-# Make directories for each sample:
-mkdir kallisto_quants
-cd kallisto_quants
-for i in $samples; do mkdir $i; done
-cd ..
-
-
-# Perform the actual pseudo-quantification for all of the samples + technical replicates
-
-parallel -j 13 kallisto quant -i subsamp_auratus.idx -o kallisto_quants/{} -b 100 \
-{}.TRIM_1P.cor.fq {}.TRIM_2P.cor.fq ::: $samples
-
-# Given the sequencing depth, it might be useful to just combine the 'tech reps' into one file. Then we have to pseudo-quantify them in Kallisto too
+# Given the sequencing depth, I will just combine the 'tech reps' into one file. 
 ids=$(ls *L1_TRIM_1P.fastq | sed 's/_L1_TRIM_1P.fastq//g') 
 for i in $ids; do cat $i_L1_TRIM_1P.fastq $i_L2_TRIM_1P.fastq > $i_COM_R1.fastq; done
 for i in $ids; do cat $i_L1_TRIM_2P.fastq $i_L2_TRIM_2P.fastq > $i_COM_R2.fastq; done
@@ -226,47 +91,133 @@ for i in $ids; do cat $i_L1_TRIM_2P.fastq $i_L2_TRIM_2P.fastq > $i_COM_R2.fastq;
 parallel -j 12 cat {}_L1_TRIM_1P.fastq {}_L2_TRIM_1P.fastq > {}_COM_R1.fastq ::: $ids
 parallel -j 12 cat {}_L1_TRIM_2P.fastq {}_L2_TRIM_2P.fastq > {}_COM_R2.fastq ::: $ids
 
-combinedsamples=$(ls *_COM_R1.fastq | sed 's/)
 
-mkdir kallisto_quants_combined
-cd kallisto_quants_combined
-for i in $combinedsamples; do mkdir $i; done
+/home/summersk/programs/Oyster_River_Protocol/oyster.mk main \
+MEM=1250 \
+CPU=24 \
+READ1=Blue-Black1_merged_R1.fastq.gz \
+READ2=Blue-Black1_merged_R2.fastq.gz \
+RUNOUT=Blue-Black1
+
+/home/summersk/programs/Oyster_River_Protocol/oyster.mk main \
+MEM=1250 \
+CPU=28 \
+READ1=Microspot2_merged_R1.fastq.gz \
+READ2=Microspot2_merged_R2.fastq.gz \
+RUNOUT=Microspot2
+
+/home/summersk/programs/Oyster_River_Protocol/oyster.mk main \
+MEM=1250 \
+CPU=20 \
+READ1=reads/San-Felix2_merged_R1.fastq.gz \
+READ2=reads/San-Felix2_merged_R2.fastq.gz \
+RUNOUT=San-Felix2
+
+/home/summersk/programs/Oyster_River_Protocol/oyster.mk main \
+MEM=1250 \
+CPU=24 \
+READ1=reads/Super-Blue1_merged_R1.fastq.gz \
+READ2=reads/Super-Blue1_merged_R2.fastq.gz \
+RUNOUT=Super-Blue1
+
+####MOVE THE ASSEMBLED TRANSCRIPTOMES INTO A COMMON FOLDER#####
+mkdir orthomerged_fastas
+cp assemblies/*orthomerged.fasta orthomerged_fastas/
+
+
+#######RENAME TRANSCRIPTS TO WORK WTIH ORTHOFUSER##########
+cd orthomerged_fastas
+awk '/^>/{print ">Blue-Black1_" ++i; next}{print}'  Blue-Black1.orthomerged.fasta > Blue-Black1.orthomerged.renamed.fasta
+
+awk '/^>/{print ">Microspot2_" ++i; next}{print}'  Microspot2.orthomerged.fasta > Microspot2.orthomerged.renamed.fasta
+
+awk '/^>/{print ">San-Felix2_" ++i; next}{print}'  San-Felix2.orthomerged.fasta > San-Felix2.orthomerged.renamed.fasta
+
+awk '/^>/{print ">Super-Blue1_" ++i; next}{print}'  Super-Blue1.orthomerged.fasta > Super-Blue1.orthomerged.renamed.fasta
+
+rm *orthomerged.fasta
+
 cd ..
 
-# Now perform the pseudo-quantification for the replicates...
-parallel -j 13 kallisto quant -i subsamp_auratus.idx -o kallisto_quants_combined/{} -b 100 \
-{}_COM_R1.fastq {}_COM_R2.fastq ::: $combinedsamples
+#####combine other reads into one big one, also clean all the reads####
+Cat *R1.fq > all_reads_R1.fastq
+Cat *R2.fq > all_reads_R2.fastq
+
+(ls reads/*fastq.gz | sed "s/_merged_R1.fastq.gz//g" | sed "s/_merged_R2.fastq.gz//g" | uniq) | \
+parallel -j 10 trimmomatic-0.36.jar PE -threads 4 \
+-baseout rcorr/{}_TRIM.fastq {}_R1.fastq {}_R2.fastq \
+LEADING:3 TRAILING:3 ILLUMINACLIP:barcodes.fa:2:30:10 MINLEN:25 
+
+# Then run R corrector
+(ls reads/*fastq.gz | sed "s/_merged_R1.fastq.gz//g" | sed "s/_merged_R2.fastq.gz//g" | uniq) | \
+parallel -j 10 run_rcorrector.pl -t 10 -k 31 -1 rcorr/{}_TRIM_1P.fastq -2 rcorr/{}_TRIM_2P.fastq -od rcorr
+
+# Merge all the cleaned reads
+for i in rcorr/*1P.cor.fq; do cat $i; echo; done all_reads_R1.cor.fq
+for i in rcorr/*2P.cor.fq; do cat $i; echo; done all_reads_R2.cor.fq
 
 
-# I also want to annotate to the Xenopus genome(s)
-# I've downloaded Xenopus tropicalis protein database into a file Xenopus_tropicalis.JGI_4.2.pep.all.fa
-# This is the ensembl 90 database, with x. tropicalis version jgi 4.2 
-# Data available from here: ftp://ftp.ensembl.org/pub/release-90/fasta/xenopus_tropicalis/pep/
-# Data table downloaded from here: http://www.ensembl.org/biomart/martview/419a0bb8d13579a3c79229c7c1ddceb6
+####### Merge all the assemblies into a single transcriptome using orthofuser
+
+/home/summersk/programs/Oyster_River_Protocol/orthofuser.mk all \
+READ1=rcorr/all_reads_R1.cor.fq \
+READ2=rcorr/all_reads_R2.cor.fq \
+CPU=30 RUNOUT=ortho_merged \
+FASTADIR=orthomerged_fastas/ LINEAGE=eukaryota_odb9
+
+####### Calculate BUSCO and transrate scores for the full dataset
+
+/home/summersk/programs/mod_Oyster_River_Protocol/software/orp-transrate/transrate \
+-o /home/summersk/auratus/reports/transrate_assembly-reads  \
+-a /home/summersk/auratus/auratus.merged.fasta \
+--left /home/summersk/auratus/all_reads_R1.cor.fq \
+--right /home/summersk/auratus/all_reads_R1.cor.fq \
+-t 30
+
+python /home/summersk/programs/busco/scripts/run_BUSCO.py -i /home/summersk/auratus/auratus.merged.fasta -m transcriptome --cpu 24 -l /home/summersk/busco_dbs/eukaryota_odb9 -o /home/summersk/auratus/good_busco
+
+# Scores were really atrocious for transrate, so we are going to use only the 'good' fasta scores from it.
+
+### Move the 'good' fasta into the main directory and rename it
+cp orthofuse/ortho_merged/merged/merged/good.merged.fasta .
+mv good.merged.fasta good.auratus.merged.fasta
+
+# Rename all the transcripts because aesthetics.
+awk '/^>/{print ">Transcript_" ++i; next}{print}'  good.auratus2.fasta > good.auratus2.renamed.fasta
 
 
+# Pseudo-quantification with kallisto, build the index first
+kallisto index -i new_auratus.idx  good.auratus2.renamed.fasta
 
-#Annotate with diamond, which first requires building a blast database:
-diamond makedb --in X_tropicalis_JGI_4.2_pep_and_human.txt -d subsamp
-
-# And finally, create a blast table from it:
-diamond blastx -d subsamp -q auratus.subsampled.fasta -o auratus2xenopus.m8 --threads 16 \
--f 6 salltitles qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore
+# This will list all the samples
+samples=$(ls *cor.fq | sed "s/_TRIM_1P.cor.fq//g" | sed "s/_TRIM_2P.cor.fq//g" | uniq  |\
+grep -v subsamp | grep -v all_reads)
 
 
-# Do the same for the NR protein database from NCBI
-diamond makedb --in /home/summersk/blast_nr/nr.fa -d nrdiamondbase
-diamond blastx -d nrdiamondbase -q annotated.auratus.fasta -o auratusNR.m8 --threads 32 
+# Make directories for each sample:
+mkdir new_kallisto_quants
+cd new_kallisto_quants
+for i in $samples; do mkdir $i; done
+cd ..
 
-# sort by tophit
-sort auratusNR.m8 -k 1,1 -k11,11rg | sort -u -k 1,1 --merge > auratusNR_tophit.txt
 
-## bullfrog
-diamond makedb --in /home/summersk/blat_databases/bullfrog/GCA_002284835.2_RCv2.1_protein.faa -d bullfrogdb
-diamond blastx -d bullfrogdb -q annotated.auratus.fasta -o auratus2bullfrog.m8 --threads 32 
-sort auratus2bullfrog.m8 -k 1,1 -k11,11rg | sort -u -k 1,1 --merge > auratus2bullfrog_tophit.txt
+# Perform the actual pseudo-quantification for all of the samples + technical replicates
 
-## Concatenate all of the  annotation files together...
-cat auratus2xenopus_tophit.txt auratus2bullfrog_tophit.txt auratusNR_tophit.txt > full_annotation_file.txt
+parallel -j 12 kallisto quant -i /home/summersk/auratus/new_auratus.idx -o new_kallisto_quants/{} -b 100 \
+{}_TRIM_1P.cor.fq {}_TRIM_2P.cor.fq ::: $samples
 
-sort full_annotation_file.txt -k 1,1 -k11,11rg | sort -u -k 1,1 --merge > full_annotation_tophit.txt
+
+#### Annotation with diamond to amphibian (xenopus, nanorana, rana peptides) + UniRef90 databases
+
+# cat all peptides together (, makedb in diamond
+cat GCA_002284835.2_RCv2.1_protein.faa Nanorana_parkeri.gene.v2.pep orthodb.fasta uniref90.fasta Xenopus_tropicalis.JGI_4.2.pep.all.fa > all_peptides.fa
+  
+  
+  diamond makedb --in all_peptides.fa -d allpep
+  diamond blastx -d /home/summersk/peptide_databases/allpep.dmnd -q annotated.auratus.fasta -o auratus2allpep.m8 --threads 32 
+
+# sort by top hit
+sort newauratus2allpep.m8 -k 1,1 -k11,11rg | sort -u -k 1,1 --merge > newallpep_tophit.txt
+
+## This approach yields 47% annotation rate
+
