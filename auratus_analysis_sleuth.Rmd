@@ -65,49 +65,56 @@ plot_loadings(so, pc_input = 1)
 plot_loadings(so, pc_input = 2)
 ```
 
+Now I'll annotation files to look at overall gene expression and finally do a gene ontology analysis. We have collated a list of genes involved in color and pattern (largely from zebrafish studies) which we will target. I've downloaded the *Xenopus* and *Nanorana* peptide databases, and also downloaded our list of proteins from the Uniref database.
 
-Next I'll use a Xenopus annotation and Biomart to look at gene expression and gene ontology analyses, particularly with targeted color genes. Forthis, I've already downloaded the appropriate data from BioMart. 
+```{r, eval=FALSE}
+# this is to download the xenopus data from biomart. don't run after the first time.
+ensembl=useMart("ensembl")
+ xenopus <- useMart("ensembl", dataset = "xtropicalis_gene_ensembl")
 
-
+ t2g <- biomaRt::getBM(attributes = c("ensembl_peptide_id_version",  "external_gene_name"), mart = xenopus)    
+ write.table(t2g, "xenpep2gene.tsv", sep = "\t")
+```
 
 
 ```{r}
 
 # First download the Xenopus annotation from linux/enrique
-xenann <- read.table("auratus2xenopus_tophit.txt", header = FALSE, fill = TRUE)
-colnames(xenann)[c(1:12)] <- c("transcript_id", "ensembl_peptide_id_version", "percentage_id_matches",
+xenann <- read.table("newallpep_tophit.txt", header = FALSE, fill = TRUE)
+colnames(xenann)[c(1:12)] <- c("transcript_id", "peptide_id", "percentage_id_matches",
                               "alignment_length", "number_mismatches", "number_gap_openings",
                               "query_start", "query_end", "alignment_start", "alignment_end",
                               "expected_value", "bitscore")
 
-ensembl=useMart("ensembl")
-xenopus <- useMart("ensembl", dataset = "xtropicalis_gene_ensembl")
+### Load the annotation data
+# Xenopus
+x2g <- fread("annotationmappingdocuments/xenpep2gene.tsv", header = FALSE)
+x2g <- x2g[,-1]
+colnames(x2g) <- c("peptide_id", "gene_name")
 
-t2g <- biomaRt::getBM(attributes = c("ensembl_peptide_id_version", "ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = xenopus)        
-write.csv(t2g, "xenopus_id2gene.csv")
+# Nanorana
+n2g <- fread("annotationmappingdocuments/nan2gene.tsv", header = FALSE)
+colnames(n2g) <- c("peptide_id", "gene_name")
 
-# t2g <- as.data.frame(fread("xenopus_id2gene.csv"))
-# t2g <- t2g[,-1] 
+# Uniref
+u2g <- fread("annotationmappingdocuments/uniprotlistnew", header = TRUE)
+u2g <- u2g[,c(1,5)]
+u2g$peptide_id <- ""
+u2g$peptide_id <- paste("UniRef90_", u2g$Entry)
+u2g <- u2g[,c(3,2)]
+colnames(u2g) <- c("peptide_id", "gene_name")
 
-# t2g <- fread("xenopus_auratus_t2g_data.csv")
-# t2g <- t2g[,-1]
+# merge all
+a2g <- rbind(x2g, n2g, u2g)
+
+
 
 xen <- xenann[,c(1:2)]
 
 
-biggie <- dplyr::left_join(xen, t2g, by = "ensembl_peptide_id_version")
+biggie <- dplyr::left_join(xen, a2g, by = "peptide_id")
+colnames(biggie)[1] <- "target_id"
 
-#t2g <- biomaRt::getBM(attributes = c("ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = mart)
-biggie <- dplyr::rename(biggie, target_id = transcript_id,
-  ens_gene = ensembl_gene_id, ext_gene = external_gene_name)
-
-# so <- sleuth_prep(s2c, target_mapping = t2g)
-
-# so2g <- sleuth_prep(samples, target_mapping = biggie)
-
-
-# population
-# first prep the population matrix
 pop_design <- model.matrix(~0 + samples$morph)
 colnames(pop_design) <- levels(samples$morph)
 
@@ -124,14 +131,15 @@ sopop_lrt <- sleuth_lrt(sopop, "reduced", "full")
 # Ok I don't know why that doesn't actually work....
 
 pop_lrt_results <- sleuth_results(sopop_lrt, 'reduced:full', test_type = 'lrt')
-table(pop_lrt_results[,"qval"] < 0.05) #2,824 significant transcripts between the null and the others...
+table(pop_lrt_results[,"qval"] < 0.05) #2,768 significant transcripts between the null and the others...
 pop_sig_results <-  pop_lrt_results[order(pop_lrt_results$qval),]
 pop_siggies <- pop_sig_results[ which(pop_sig_results$qval < 0.05),]
+write.csv(pop_siggies, "auratus_significant_genes.csv")
 ```
 
 
 
-Ok, 2,824 'significant' transcripts (statistically speaking). This is about 8.1% of transcripts. Now on to do some differential expression by candidate color genes, followed by some fancy shit like GO analyses. Now is probably a good time to attempt to learn that bullshit.
+Ok, 2,768 'significant' transcripts (statistically speaking). This is about 8.1% of transcripts. Now on to do some differential expression by candidate color genes, followed by some fancy shit like GO analyses. Now is probably a good time to attempt to learn that bullshit.
 
 
 
@@ -181,7 +189,7 @@ mat <- spread_abundance_by(so$obs_norm, "tpm",
 ```
 
 
-Looks like PC1 = 36% of the variance and PC2 = 20%. Doesn't explain a huge amount of the variation.
+Looks like PC1 = 37% of the variance and PC2 = 21%. Doesn't explain a huge amount of the variation.
 
 
 Load the importance for both PC1 and PC2 in descending order (ie, those with the biggest effect on the principal component will be first).
@@ -208,10 +216,10 @@ pc2 <- pc2[,-2]
 Get the significant ones, and only those that are classified as "genes" with an external gene name. I'm going to load this into GOrilla for now.
 
 ```{R}
-GO <- dplyr::filter(pop_siggies, ext_gene != "NA")
-GO <- dplyr::filter(GO, ext_gene != "")
+GO <- dplyr::filter(pop_siggies, gene_name != "NA")
+GO <- dplyr::filter(GO, gene_name != "")
 
-write.csv(GO, "xenopus_genes4GOrilla.csv")
+write.csv(GO, "genes4GOrilla.csv")
 ```
 
 
@@ -219,10 +227,15 @@ Now I will go through the series of candidate color genes to see what is differe
 
 
 ```{r}
-colors <- read.table("color_genes.txt")
-colnames(colors)[1] <- "ext_gene"
+colors <- read.csv("color_genes_3-26-18.csv")
+colnames(colors)[1] <- "gene_name"
 
-colors <- dplyr::left_join(colors, pop_lrt_results, by = "ext_gene")
+
+# Make them all lower case...
+colors$gene_name <- tolower(colors$gene_name)
+
+pop_lrt_results$gene_name <- tolower(pop_lrt_results$gene_name)
+colors <- dplyr::left_join(colors, pop_lrt_results, by = "gene_name")
 
 ## Order them by 'significance'
 colors <-  colors[order(colors$qval),]
@@ -236,42 +249,241 @@ sig_colors <- dplyr::filter(colors, qval < 0.05)
 
 
 ##### This will iterate through and make a nice figure for each of the statistically significant color genes
-
-
 for (i in 1:nrow(sig_colors)){
-  transcript <- sig_colors[i,2]
-  gene <- sig_colors[i,1]
-  qval <- sig_colors[i,5]
+  transcript <- sig_colors[i,"target_id"]
+  gene <- sig_colors[i,"gene_name"]
+  qval <- sig_colors[i,"qval"]
   tmp <- sopop$obs_norm %>% dplyr::filter(target_id == transcript)  ### These are normalized values I think!
   tmp <- dplyr::full_join(sopop$sample_to_covariates, tmp, by = 'sample')
   tmp
   
   
-a <- ggplot(tmp, aes(x=morph, y=tpm)) + xlab("Morph") + ylab("Transcripts per million") + geom_point(aes(size = 3, color = morph)) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(title = "Color morph", override.aes = list(size=4))) +  geom_smooth(method = loess) + ggtitle(paste0(gene, "\n(", transcript, "), q value = ", qval)) + guides(size=FALSE)
+a <- ggplot(tmp, aes(x=morph, y=tpm)) + xlab("Morph") + ylab("Transcripts per million") + geom_jitter(aes(size = 3, color = morph), width = 0.2, height = 0) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(title = "Color morph", override.aes = list(size=4))) +  geom_smooth(method = loess) + ggtitle(paste0(gene, ", ", "\n(", transcript, "), q value = ", qval)) + guides(size=FALSE) + theme_bw() + theme(panel.grid.major = element_blank())
 
  
   ggsave(paste0("colorgene-figures/", gene, "-", transcript, ".png"), width = 6.81, height = 3.99)
 }
 
+# For loop that iterates through with description...
+
+# for (i in 1:nrow(sig_colors)){
+#  transcript <- sig_colors[i,"target_id"]
+#  gene <- sig_colors[i,"ext_gene"]
+#  qval <- sig_colors[i,"qval"]
+#  desc <- sig_colors[i,"description"]
+#  tmp <- sopop$obs_norm %>% dplyr::filter(target_id == transcript)  ### These are normalized values I think!
+#  tmp <- dplyr::full_join(sopop$sample_to_covariates, tmp, by = 'sample')
+#  tmp
+  
+  
+#a <- ggplot(tmp, aes(x=morph, y=tpm)) + xlab("Morph") + ylab("Transcripts per million") + geom_jitter(aes(size = 3, color = morph), width = 0.2, height = 0) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(title = "Color morph", override.aes = list(size=4))) +  geom_smooth(method = loess) + ggtitle(paste0(gene, ", ", desc, "\n(", transcript, "), q value = ", qval)) + guides(size=FALSE) + theme_bw() + theme(panel.grid.major = element_blank())
+
+ 
+#  ggsave(paste0("colorgene-figures/", gene, "-", transcript, ".png"), width = 6.81, height = 3.99)
+# }
+
 write.csv(colors, "auratus_color_gene_stats.csv")
+write.csv(sig_colors, "auratus_significant_color_gene_stats.csv")
+
+```
+
+
+We ended up losing some of the color specific genes, I assume because there was a *slightly better* mapping to either *Rana* or *Nanorana*, so we will do the same as above, but just with the *Xenopus* annotation to try and recover those color genes. It seems like there could be a way to combine these programmatically, but this is just a first pass.
+
+
+```{r}
+
+# First download the Xenopus annotation from linux/enrique
+xenopus <- read.table("newxen_tophit.txt", header = FALSE, fill = TRUE)
+colnames(xenopus)[c(1:12)] <- c("transcript_id", "peptide_id", "percentage_id_matches",
+                              "alignment_length", "number_mismatches", "number_gap_openings",
+                              "query_start", "query_end", "alignment_start", "alignment_end",
+                              "expected_value", "bitscore")
+
+
+xenopus <- xenopus[,c(1:2)]
+
+
+xen_full <- dplyr::left_join(xenopus, x2g, by = "peptide_id")
+
+xen_full <- dplyr::rename(xen_full, target_id = transcript_id)
+
+pop_design <- model.matrix(~0 + samples$morph)
+colnames(pop_design) <- levels(samples$morph)
+
+
+
+sopop_b <- sleuth_prep(samples, full_model = pop_design, num_cores = 6, target_mapping = xen_full)
+
+sopop_b <- sleuth_fit(sopop_b, formula = pop_design, fit_name = "full")
+sopop_b <- sleuth_fit(sopop_b, formula = ~ 1, fit_name = "reduced")
+#so <- sleuth_fit(so, full_model = spline_design)
+models(sopop_b)
+sopop_b_lrt <- sleuth_lrt(sopop_b, "reduced", "full")
+# so_wt <- sleuth_wt(so, "reduced", "full")
+# Ok I don't know why that doesn't actually work....
+
+pop_b_lrt_results <- sleuth_results(sopop_b_lrt, 'reduced:full', test_type = 'lrt')
+table(pop_b_lrt_results[,"qval"] < 0.05) #2,824 significant transcripts between the null and the others...
+pop_b_sig_results <-  pop_b_lrt_results[order(pop_b_lrt_results$qval),]
+pop_b_siggies <- pop_b_sig_results[ which(pop_b_sig_results$qval < 0.05),]
+
+write.csv(pop_b_siggies, "auratus_blat_significant_genes.csv")
+
+GOb <- dplyr::filter(pop_b_siggies, gene_name != "NA")
+GOb <- dplyr::filter(GOb, gene_name != "")
+
+write.csv(GOb, "xenopus_blat_genes4GOrilla.csv")
+
+
+
+pop_b_lrt_results$gene_name <- tolower(pop_b_lrt_results$gene_name)
+
+colorsb <- dplyr::left_join(colors, pop_b_lrt_results, by = "gene_name")
+
+## Order them by 'significance'
+colorsb <-  colorsb[order(colorsb$qval),]
+
+# Drop color genes that don't have an associated transcript
+colorsb <- dplyr::filter(colorsb, target_id != "NA")
+
+## These are just the 'statistically significant' hits
+sig_b_colors <- dplyr::filter(colorsb, qval < 0.05)
+
+write.csv(colorsb, "auratus_xenopus_color_gene_stats.csv")
+write.csv(sig_b_colors, "auratus_xenopus_significant_color_genes.csv")
+```
+
+
+
+
+##################################### everything below here is shit ##########################################
+
+
+
+The below gets gene descriptions, so I can see what they actually are! I like the idea of this.
+   
+```{R}
+
+atts <- listAttributes(xenopus)
+
+g2desc <- biomaRt::getBM(attributes = c("ensembl_peptide_id_version", "ensembl_gene_id", "external_gene_name", "description"), mart = xenopus)  
+
+desc <- g2desc[,3:4]
+colnames(desc)[1] <- "ext_gene"
+
+colors <- dplyr::left_join(colors, desc, by = "ext_gene")
+write.csv(colors, "color_genes.csv")
+
+```
+
+
+
+This chunk is me trying to learn how to download all the relevant data from the internet for the Xenopus, bullfrog, and NR databases...
+
+```{r}
+upload <- list()
+for (i in 1:nrow(fullanno)){
+  search <- fullanno[i,"ensembl_transcript_id_version"]
+  
+tmp <- entrez_search(db = "protein", term = search, use_history = TRUE)
+upload <- rbind(tmp, upload)
+}
+
+
+
+
+
+
+ensembl=useMart("ENSEMBL_MART_ENSEMBL")
+sets <- listDatasets(ensembl)
+
+all2gene <- biomaRt::getBM(attributes = c("ensembl_peptide_id_version", "ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = ensembl)
+
+
+
+library(biomartr)
+biomartr::listNCBIDatabases()
+getMarts()
+
+
+
+entrez_dbs()
+entrez_db_searchable("protein")
+  # I think I want c("ACCN", "GENE", "UID")
 
 ```
 
 
 
 
-   
+
+
+
+```{r}
+
+all_links_together  <- entrez_link(db="gene", dbfrom="protein", id=ids)
+all_links_together$links
+all_links_together$links$protein_gene
+
+eh <- entrez_fetch(db="gene", dbfrom="protein", id=ids, rettype = "native")
+
+entrez_dbs()
+
+
+
+
+entrez_db_summary(db="protein")
+
+allnr <- entrez_search(db="protein", term="")
+
+nano <- entrez_search(db="protein", term="Nanorana parkeri")
+nano
+
+bull <- entrez_search(db="protein", term="Rana catesbeiana[ORGN]", use_history = TRUE)
+
+bull
+bull$file
+
+bull_proteins <- entrez_fetch(db="protein", id=bull$id, rettype="fasta")
 
 
 
 
 
+entrez_summary(db="protein", web_history=bull$web_history)
+
+bull$web_history
+
+for( seq_start in seq(1,200,50)){
+    recs <- entrez_fetch(db="protein", web_history=bull$web_history,
+                         rettype="ft", parsed = TRUE, retmax=50, retstart=seq_start)
+    cat(recs, file="bull.xml", append=TRUE)
+    cat(seq_start+49, "sequences downloaded\r")
+}
+
+nchar(recs)
+cat(strwrap(substr(bull, 1, 1000)), sep="\n")
+
+
+
+asthma_variants <- entrez_link(dbfrom="omim", db="clinvar", cmd="neighbor_history", web_history=upload)
+
+snp_links <- entrez_link(dbfrom="clinvar", db="snp",
+                         web_history=asthma_variants$web_histories$omim_clinvar,
+                         cmd="neighbor_history")
+snp_summ <- entrez_summary(db="snp", web_history=snp_links$web_histories$clinvar_snp)
+knitr::kable(extract_from_esummary(snp_summ, c("chr", "fxn_class", "global_maf")))
 
 
 
 
+bullfrog <- entrez_fetch(db="protein", term="Rana catesbeiana", rettype = "xml")
+bullfrog <- entrez_fetch()
+
+entrez_db_searchable(db="protein")
 
 
-
+```
 
 
