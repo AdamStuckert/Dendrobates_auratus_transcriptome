@@ -214,10 +214,14 @@ cat GCA_002284835.2_RCv2.1_protein.faa Nanorana_parkeri.gene.v2.pep orthodb.fast
   
   
   diamond makedb --in all_peptides.fa -d allpep
-  diamond blastx -d /home/summersk/peptide_databases/allpep.dmnd -q annotated.auratus.fasta -o auratus2allpep.m8 --threads 32 
+  diamond blastx -d /home/summersk/peptide_databases/allpep.dmnd -q good.auratus2.renamed.fasta -o newauratus2allpep.m8 --threads 32 
 
 # sort by top hit
-sort newauratus2allpep.m8 -k 1,1 -k11,11rg | sort -u -k 1,1 --merge > newallpep_tophit.txt
+sort newauratus2allpep.m8 -k 1,1 -k11,11g | sort -u -k 1,1 --merge > newallpep_tophit.txt
 
+# xenopus only...
+diamond blastx -d /home/summersk/peptide_databases/xen.dmnd -q good.auratus2.renamed.fasta -o newxen2allpep.m8 --threads 32 
+sort newxen2allpep.m8 -k 1,1 -k11,11g | sort -u -k 1,1 --merge > newxen_tophit.txt
 ## This approach yields 47% annotation rate
 
+sort tmp.txt -k 1,1 -k11,11g | sort -u -k 1,1 --merge > tmp2.txt
