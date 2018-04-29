@@ -43,7 +43,7 @@ samples
 
 
 ```{r}
-so <- sleuth_prep(samples, transformation_function = function(x) log2(x + 0.5))
+so <- sleuth_prep(samples) #, transformation_function = function(x) log2(x + 0.5)
 
 plot_pca(so, text_labels = TRUE)
 ```
@@ -245,7 +245,7 @@ pop_lrt_results$gene_name <- tolower(pop_lrt_results$gene_name)
 colors <- dplyr::left_join(colors, pop_lrt_results, by = "gene_name")
 
 ## Order them by 'significance'
-colors <-  colors[order(colors$qval),]
+colors <-  colors[order(colors$gene_name),]
 
 # Drop color genes that don't have an associated transcript
 colors <- dplyr::filter(colors, target_id != "NA")
@@ -271,28 +271,115 @@ a <- ggplot(tmp, aes(x=morph, y=tpm)) + xlab("Morph") + ylab("Transcripts per mi
   ggsave(paste0("colorgene-figures/", gene, "-", transcript, ".png"), width = 6.81, height = 3.99)
 }
 
-# For loop that iterates through with description...
-
-# for (i in 1:nrow(sig_colors)){
-#  transcript <- sig_colors[i,"target_id"]
-#  gene <- sig_colors[i,"ext_gene"]
-#  qval <- sig_colors[i,"qval"]
-#  desc <- sig_colors[i,"description"]
-#  tmp <- sopop$obs_norm %>% dplyr::filter(target_id == transcript)  ### These are normalized values I think!
-#  tmp <- dplyr::full_join(sopop$sample_to_covariates, tmp, by = 'sample')
-#  tmp
-  
-  
-#a <- ggplot(tmp, aes(x=morph, y=tpm)) + xlab("Morph") + ylab("Transcripts per million") + geom_jitter(aes(size = 3, color = morph), width = 0.2, height = 0) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(title = "Color morph", override.aes = list(size=4))) +  geom_smooth(method = loess) + ggtitle(paste0(gene, ", ", desc, "\n(", transcript, "), q value = ", qval)) + guides(size=FALSE) + theme_bw() + theme(panel.grid.major = element_blank())
-
- 
-#  ggsave(paste0("colorgene-figures/", gene, "-", transcript, ".png"), width = 6.81, height = 3.99)
-# }
 
 write.csv(colors, "auratus_color_gene_stats.csv")
 write.csv(sig_colors, "auratus_significant_color_gene_stats.csv")
 
 ```
+
+Extract fold changes.
+
+```{r}
+sopop <- sleuth_wt(sopop, 'Blue-Black')
+sopop <- sleuth_wt(sopop, 'Microspot')
+sopop <- sleuth_wt(sopop, 'San-Felix')
+sopop <- sleuth_wt(sopop, 'Super-Blue')
+bbwalds <- sleuth_results(sopop, 'Blue-Black', test_type = "wt", which_model = "full",
+  rename_cols = TRUE, show_all = TRUE)
+bb2bb<- sleuth_results(sopop, 'Blue-Black', test_type = "wt", which_model = "full",
+  rename_cols = TRUE, show_all = TRUE)
+bb2micro <- sleuth_results(sopop, 'Microspot', test_type = "wt", which_model = "full",
+  rename_cols = TRUE, show_all = TRUE)
+bb2sanfel <- sleuth_results(sopop, 'San-Felix', test_type = "wt", which_model = "full",
+  rename_cols = TRUE, show_all = TRUE)
+bb2super <- sleuth_results(sopop, 'Super-Blue', test_type = "wt", which_model = "full",
+  rename_cols = TRUE, show_all = TRUE)
+
+
+pop_design <- model.matrix(~0 + samples$morph)
+colnames(pop_design) <- levels(samples$morph)
+
+micro_pop_design <- pop_design[,c(2,3,4,1)]
+sanfel_pop_design <- pop_design[,c(3,4,1,2)]
+
+
+
+sopop <- sleuth_fit(sopop, formula = micro_pop_design, fit_name = "2full")
+sopop <- sleuth_fit(sopop, formula = sanfel_pop_design, fit_name = "3full")
+
+sopop <- sleuth_wt(sopop, 'Microspot', '2full')
+sopop <- sleuth_wt(sopop, 'San-Felix', '2full')
+sopop <- sleuth_wt(sopop, 'Super-Blue', '2full')
+micro2sanfel <- sleuth_results(sopop, 'San-Felix', test_type = "wt", which_model = "2full",
+  rename_cols = TRUE, show_all = TRUE)
+micro2super <- sleuth_results(sopop, 'Super-Blue', test_type = "wt", which_model = "2full",
+  rename_cols = TRUE, show_all = TRUE)
+
+```
+
+
+
+Extract effect sizes...
+
+```{r}
+
+# This will get the effect sizes for the morphs by gene....
+full_model <- extract_model(sopop, 'full')
+
+morphs <- list('Blue-Black', 'Microspot', 'San-Felix', 'Super-Blue')
+
+size <- nrow(full_model)
+
+effect_sizes <- data.frame(target_id = unique(full_model$target_id))
+
+for (i in morphs){
+  tmp <- dplyr::filter(full_model, term == i)
+  tmp <- tmp[,c(1,3,4)]
+  colnames(tmp)[2] <- paste0(i, "_estimate")
+  colnames(tmp)[3] <- paste0(i, "_std_error")
+  effect_sizes <- merge(effect_sizes, tmp, by = "target_id")
+}
+
+
+# get est? idk man.
+kaltab <- kallisto_table(sopop)
+
+eh <- kaltab %>% group_by(target_id, morph) %>% summarise(counts = mean(est_counts)) 
+# get unique rows????
+
+eh2 <- kaltab %>% group_by(target_id, morph) %>% summarise(error = sd(est_counts))
+
+eh3 <- dplyr::bind_cols(eh,eh2)
+
+
+
+###left off here, quick for loop to make shit happen with combining columns or some shit.
+
+
+
+
+
+iris %>%
+ group_by(Species) %>%
+ summarise(avg = mean(Sepal.Width)) %>%
+ arrange(avg)
+
+effect_sizes <- dplyr::inner_join(
+  dplyr::select(dplyr::filter(full_model, term == 'Blue-Black'),
+    target_id, full_estimate = estimate),
+  dplyr::select(dplyr::filter(reduced_model, term == 'Blue-Black'),
+    target_id, reduced_estimate = estimate),
+  by = 'target_id'
+  )
+
+dplyr::inner_join(
+  dplyr::select(top_different[1:10, ], target_id),
+  effect_sizes,
+  by = 'target_id')
+
+```
+
+
 
 
 We ended up losing some of the color specific genes, I assume because there was a *slightly better* mapping to either *Rana* or *Nanorana*, so we will do the same as above, but just with the *Xenopus* annotation to try and recover those color genes. It seems like there could be a way to combine these programmatically, but this is just a first pass.
@@ -385,8 +472,8 @@ Now, why are there differences between the full annotation and the *Xenopus* ann
 
 ```{r}
 # xen
-xencolors <- sig_b_colors[,c(2,1,15)]
-colnames(xencolors) <- c("target_id", "xen_gene_name", "xen_peptide_id")
+xencolors <- sig_b_colors[,c(2,1,5, 15)]
+colnames(xencolors) <- c("target_id", "xen_gene_name", "qval", "xen_peptide_id")
 
 # full
 allcolors <- pop_lrt_results[,c(1,15,14)]
@@ -405,24 +492,30 @@ xentable <- dplyr::left_join(xencolors, xenann1, by = "target_id")
 alltable <- dplyr::left_join(ann1, allcolors, by = "target_id")
 
 table <- dplyr::left_join(xentable, alltable, by = "target_id")
+table <- table[order(table$xen_gene_name),]
 write.csv(table, "xenvsall_evals_colorgenes.csv")
 
 ## now full 2 xen
-all <- sig_colors[,c(2,1,15)]
-colnames(all) <- c("target_id", "all_gene_name", "all_peptide_id")
+all <- sig_colors[,c(2,1,5,15)]
+colnames(all) <- c("target_id", "all_gene_name", "qval",  "all_peptide_id")
 
 # xen
 xentran <- pop_b_lrt_results[,c(1,15,14)]
 colnames(xentran) <- c("target_id", "xen_gene_name", "xen_peptide_id")
 
 # merge
-alltable <- dplyr::left_join(all, alltable, by = "target_id")
+#alltable <- dplyr::left_join(all, alltable, by = "target_id")
 table2 <- dplyr::left_join(alltable, xentable, by = "target_id")
+table2 <- table2[order(table2$all_gene_name)]
 write.csv(table2, "allvsxen_evals_colorgenes.csv")
 
 
+pop_lrt_results[order(pop_lrt_results$qval),]
 
+realtable <- merge(all, xentable, by = "target_id", all = TRUE)
+realtable <- realtable[order(realtable$all_gene_name),]
 
+write.csv(realtable, "annotation_values_colorgenes.csv")
 ```
 
 
@@ -495,12 +588,4 @@ com <- grid.arrange(bp4, bp5, bp6, nrow = 3)
 com
 ggsave("panther/combinedbarplots.png", com, width = 6.81, height = 12, dpi = 600)
 ````
-
-Wald tests?
-
-```{R}
-
-
-
-```
 
