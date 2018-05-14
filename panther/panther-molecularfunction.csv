@@ -1,0 +1,10 @@
+Category_name,Genes,Percent_genes,Percent_molecularfunction_hits
+transporter activity (GO:0005215),56,3.60%,5.20%
+translation regulator activity (GO:0045182),14,0.90%,1.30%
+catalytic activity (GO:0003824),447,28.80%,41.20%
+channel regulator activity (GO:0016247),1,0.10%,0.10%
+receptor activity (GO:0004872),33,2.10%,3.00%
+signal transducer activity (GO:0004871),40,2.60%,3.70%
+antioxidant activity (GO:0016209),3,0.20%,0.30%
+structural molecule activity (GO:0005198),57,3.70%,5.30%
+binding (GO:0005488),433,27.90%,39.90%

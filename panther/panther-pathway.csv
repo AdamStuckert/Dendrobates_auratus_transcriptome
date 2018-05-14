@@ -1,0 +1,128 @@
+Category_name,Genes,Percent_genes,Percent_pathway_hits
+Axon guidance mediated by netrin (P00009),3,0.20%,0.40%
+Axon guidance mediated by Slit/Robo (P00008),7,0.50%,0.90%
+Axon guidance mediated by semaphorins (P00007),10,0.60%,1.30%
+Apoptosis signaling pathway (P00006),15,1.00%,1.90%
+Gonadotropin-releasing hormone receptor pathway (P06664),29,1.90%,3.70%
+Angiogenesis (P00005),22,1.40%,2.80%
+Ornithine degradation (P02758),1,0.10%,0.10%
+Alzheimer disease-presenilin pathway (P00004),17,1.10%,2.20%
+Alzheimer disease-amyloid secretase pathway (P00003),6,0.40%,0.80%
+N-acetylglucosamine metabolism (P02756),1,0.10%,0.10%
+Alpha adrenergic receptor signaling pathway (P00002),4,0.30%,0.50%
+Methylmalonyl pathway (P02755),1,0.10%,0.10%
+Adrenaline and noradrenaline biosynthesis (P00001),6,0.40%,0.80%
+Methylcitrate cycle (P02754),1,0.10%,0.10%
+Mannose metabolism (P02752),2,0.10%,0.30%
+CCKR signaling map (P06959),22,1.40%,2.80%
+Ubiquitin proteasome pathway (P00060),9,0.60%,1.10%
+Leucine biosynthesis (P02749),1,0.10%,0.10%
+p53 pathway (P00059),8,0.50%,1.00%
+Isoleucine biosynthesis (P02748),1,0.10%,0.10%
+mRNA splicing (P00058),2,0.10%,0.30%
+Histidine biosynthesis (P02747),1,0.10%,0.10%
+Wnt signaling pathway (P00057),24,1.50%,3.00%
+Heme biosynthesis (P02746),2,0.10%,0.30%
+VEGF signaling pathway (P00056),10,0.60%,1.30%
+Glutamine glutamate conversion (P02745),2,0.10%,0.30%
+Transcription regulation by bZIP transcription factor (P00055),6,0.40%,0.80%
+Fructose galactose metabolism (P02744),1,0.10%,0.10%
+Toll receptor signaling pathway (P00054),6,0.40%,0.80%
+Formyltetrahydroformate biosynthesis (P02743),3,0.20%,0.40%
+Tetrahydrofolate biosynthesis (P02742),1,0.10%,0.10%
+T cell activation (P00053),10,0.60%,1.30%
+TGF-beta signaling pathway (P00052),5,0.30%,0.60%
+Flavin biosynthesis (P02741),1,0.10%,0.10%
+De novo pyrimidine ribonucleotides biosythesis (P02740),4,0.30%,0.50%
+Plasminogen activating cascade (P00050),1,0.10%,0.10%
+De novo pyrimidine deoxyribonucleotide biosynthesis (P02739),2,0.10%,0.30%
+Parkinson disease (P00049),16,1.00%,2.00%
+De novo purine biosynthesis (P02738),5,0.30%,0.60%
+PI3 kinase pathway (P00048),6,0.40%,0.80%
+PDGF signaling pathway (P00047),27,1.70%,3.40%
+Coenzyme A biosynthesis (P02736),1,0.10%,0.10%
+Oxidative stress response (P00046),5,0.30%,0.60%
+Notch signaling pathway (P00045),5,0.30%,0.60%
+Nicotinic acetylcholine receptor signaling pathway (P00044),8,0.50%,1.00%
+Muscarinic acetylcholine receptor 2 and 4 signaling pathway (P00043),5,0.30%,0.60%
+Muscarinic acetylcholine receptor 1 and 3 signaling pathway (P00042),6,0.40%,0.80%
+Metabotropic glutamate receptor group I pathway (P00041),2,0.10%,0.30%
+Asparagine and aspartate biosynthesis (P02730),2,0.10%,0.30%
+Metabotropic glutamate receptor group II pathway (P00040),5,0.30%,0.60%
+Synaptic vesicle trafficking (P05734),1,0.10%,0.10%
+GABA-B receptor II signaling (P05731),3,0.20%,0.40%
+Endogenous cannabinoid signaling (P05730),2,0.10%,0.30%
+Metabotropic glutamate receptor group III pathway (P00039),5,0.30%,0.60%
+Arginine biosynthesis (P02728),1,0.10%,0.10%
+Ionotropic glutamate receptor pathway (P00037),2,0.10%,0.30%
+Aminobutyrate degradation (P02726),1,0.10%,0.10%
+Interleukin signaling pathway (P00036),9,0.60%,1.10%
+Alanine biosynthesis (P02724),1,0.10%,0.10%
+Interferon-gamma signaling pathway (P00035),1,0.10%,0.10%
+Xanthine and guanine salvage pathway (P02788),1,0.10%,0.10%
+Adenine and hypoxanthine salvage pathway (P02723),2,0.10%,0.30%
+Integrin signalling pathway (P00034),40,2.60%,5.10%
+Insulin/IGF pathway-protein kinase B signaling cascade (P00033),5,0.30%,0.60%
+ATP synthesis (P02721),1,0.10%,0.10%
+Insulin/IGF pathway-mitogen activated protein kinase kinase/MAP kinase cascade (P00032),5,0.30%,0.60%
+p53 pathway feedback loops 2 (P04398),6,0.40%,0.80%
+Valine biosynthesis (P02785),1,0.10%,0.10%
+Inflammation mediated by chemokine and cytokine signaling pathway (P00031),32,2.10%,4.10%
+p53 pathway by glucose deprivation (P04397),5,0.30%,0.60%
+Tyrosine biosynthesis (P02784),1,0.10%,0.10%
+Hypoxia response via HIF activation (P00030),4,0.30%,0.50%
+Vitamin D metabolism and pathway (P04396),2,0.10%,0.30%
+Vasopressin synthesis (P04395),1,0.10%,0.10%
+Thyrotropin-releasing hormone receptor signaling pathway (P04394),6,0.40%,0.80%
+Ras Pathway (P04393),12,0.80%,1.50%
+P53 pathway feedback loops 1 (P04392),2,0.10%,0.30%
+Oxytocin receptor mediated signaling pathway (P04391),6,0.40%,0.80%
+Huntington disease (P00029),30,1.90%,3.80%
+Heterotrimeric G-protein signaling pathway-rod outer segment phototransduction (P00028),2,0.10%,0.30%
+Heterotrimeric G-protein signaling pathway-Gq alpha and Go alpha mediated pathway (P00027),12,0.80%,1.50%
+p38 MAPK pathway (P05918),8,0.50%,1.00%
+Heterotrimeric G-protein signaling pathway-Gi alpha and Gs alpha mediated pathway (P00026),9,0.60%,1.10%
+Opioid proopiomelanocortin pathway (P05917),4,0.30%,0.50%
+Hedgehog signaling pathway (P00025),3,0.20%,0.40%
+Sulfate assimilation (P02778),1,0.10%,0.10%
+Opioid prodynorphin pathway (P05916),4,0.30%,0.50%
+Glycolysis (P00024),3,0.20%,0.40%
+Succinate to proprionate conversion (P02777),1,0.10%,0.10%
+Opioid proenkephalin pathway (P05915),4,0.30%,0.50%
+General transcription regulation (P00023),5,0.30%,0.60%
+Nicotine pharmacodynamics pathway (P06587),6,0.40%,0.80%
+General transcription by RNA polymerase I (P00022),4,0.30%,0.50%
+Salvage pyrimidine ribonucleotides (P02775),3,0.20%,0.40%
+Enkephalin release (P05913),3,0.20%,0.40%
+FGF signaling pathway (P00021),20,1.30%,2.50%
+Dopamine receptor mediated signaling pathway (P05912),11,0.70%,1.40%
+FAS signaling pathway (P00020),6,0.40%,0.80%
+Angiotensin II-stimulated signaling through G proteins and beta-arrestin (P05911),6,0.40%,0.80%
+Histamine H2 receptor mediated signaling pathway (P04386),2,0.10%,0.30%
+Pyruvate metabolism (P02772),4,0.30%,0.50%
+Histamine H1 receptor mediated signaling pathway (P04385),5,0.30%,0.60%
+Pyrimidine Metabolism (P02771),2,0.10%,0.30%
+Gamma-aminobutyric acid synthesis (P04384),1,0.10%,0.10%
+Cortocotropin releasing factor receptor signaling pathway (P04380),4,0.30%,0.50%
+Endothelin signaling pathway (P00019),9,0.60%,1.10%
+EGF receptor signaling pathway (P00018),22,1.40%,2.80%
+DNA replication (P00017),5,0.30%,0.60%
+Cytoskeletal regulation by Rho GTPase (P00016),18,1.20%,2.30%
+Purine metabolism (P02769),2,0.10%,0.30%
+Circadian clock system (P00015),2,0.10%,0.30%
+Proline biosynthesis (P02768),1,0.10%,0.10%
+Cholesterol biosynthesis (P00014),2,0.10%,0.30%
+Cell cycle (P00013),3,0.20%,0.40%
+Cadherin signaling pathway (P00012),16,1.00%,2.00%
+Beta3 adrenergic receptor signaling pathway (P04379),3,0.20%,0.40%
+Blood coagulation (P00011),4,0.30%,0.50%
+Beta2 adrenergic receptor signaling pathway (P04378),4,0.30%,0.50%
+B cell activation (P00010),12,0.80%,1.50%
+Beta1 adrenergic receptor signaling pathway (P04377),4,0.30%,0.50%
+5HT4 type receptor mediated signaling pathway (P04376),3,0.20%,0.40%
+Pentose phosphate pathway (P02762),1,0.10%,0.10%
+5HT3 type receptor mediated signaling pathway (P04375),2,0.10%,0.30%
+5HT2 type receptor mediated signaling pathway (P04374),6,0.40%,0.80%
+5HT1 type receptor mediated signaling pathway (P04373),5,0.30%,0.60%
+5-Hydroxytryptamine degredation (P04372),4,0.30%,0.50%
+5-Hydroxytryptamine biosynthesis (P04371),1,0.10%,0.10%

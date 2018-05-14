@@ -9,7 +9,7 @@ output:
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
-library(biomaRt)
+# library(biomaRt)
 library(sleuth)
 library(dplyr)
 library(foreach)
@@ -52,14 +52,15 @@ plot_pca(so, text_labels = TRUE)
 I can skip the above chunk of code and come here in the future, and just load the sleuth object (so <- sleuth_load(auratus_sleuth))
 
 ```{r}
-plot_pca(so, point_size = 0.001, units = 'est_counts') + geom_point() + aes(size = 3, colour = samples$morph) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(values=c("navyblue","forestgreen","tan3","dodgerblue"), title = "Morph", override.aes = list(size=4))) + guides(size=FALSE)
+plot_pca(so, point_size = 0.001, units = 'est_counts') + geom_point() + aes(size = 3, colour = samples$morph) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(values=c("navyblue","forestgreen","tan3","dodgerblue"), title = "Morph", override.aes = list(size=4))) + guides(size=FALSE) + xlab("PC1 37.3%") + ylab("PC2 21.0%")
 
 ggsave("auratus_est-counts_pca.tiff", width = 6.81, height = 3.99)
 ```
 
 
 ```{r}
-plot_pca(so, point_size = 0.001, units = 'tpm') + geom_point() + aes(size = 3, colour = samples$morph) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(values=c("navyblue","forestgreen","tan3","dodgerblue"), title = "Morph", override.aes = list(size=4))) + guides(size=FALSE)
+# variation from below: 3.726e-01    0.2100
+plot_pca(so, point_size = 0.001, units = 'tpm') + geom_point() + aes(size = 3, colour = samples$morph) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(values=c("navyblue","forestgreen","tan3","dodgerblue"), title = "Morph", override.aes = list(size=4))) + guides(size=FALSE) + xlab("PC1 37.3%") + ylab("PC2 21.0%")
 
 ggsave("auratus_tpm_pca.tiff", width = 6.81, height = 3.99)
 ```
@@ -277,6 +278,191 @@ write.csv(sig_colors, "auratus_significant_color_gene_stats.csv")
 
 ```
 
+Make a revised lef1 figure for the ms.
+
+```{r}
+lef1 <- dplyr::filter(sopop$obs_norm, target_id == "Transcript_80126")
+lef1 <- dplyr::full_join(sopop$sample_to_covariates, lef1, by = 'sample')
+
+lef1fig <- ggplot(lef1, aes(x=morph, y=tpm)) + xlab("Morph") + ylab("Transcripts per million") + geom_jitter(aes(size = 3, color = morph), width = 0.2, height = 0) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(title = "Color morph", override.aes = list(size=4))) +  geom_smooth(method = loess) + ggtitle("Lymphoid Enhancer Binding Factor 1") + guides(size=FALSE) + theme_bw() + theme(panel.grid.major = element_blank())
+
+lef1fig
+ 
+ggsave("Figure6_lef1.png", width = 6.81, height = 3.99)
+```
+
+
+Make a heatmap of the melanin-related genes for the ms:
+
+```{r}
+
+plot_transcript_heatmap <- function(obj,
+  transcripts,
+  units = 'tpm',
+  trans = 'log',
+  offset = 1) {
+
+  # units <- check_quant_mode(obj, units)
+
+  if(!all(transcripts %in% obj$obs_norm$target_id)) {
+    stop("Couldn't find the following transcripts: ",
+      paste(transcripts[!(transcripts %in% obj$obs_norm$target_id)], collapse = ", "),
+      "\n\tIt is highly likely that some of them were filtered out.")
+  }
+
+  tabd_df <- obj$obs_norm[obj$obs_norm$target_id %in% transcripts, ]
+
+  if (units == 'tpm') {
+    tabd_df <- dplyr::select(tabd_df, target_id, sample, tpm)
+    tabd_df <- reshape2::dcast(tabd_df, target_id ~sample, value.var = 'tpm')
+  } else if (units == 'est_counts') {
+    tabd_df <- dplyr::select(tabd_df, target_id, sample, est_counts)
+    tabd_df <- reshape2::dcast(tabd_df, target_id ~sample, value.var = 'est_counts')
+  } else {
+    stop("Didn't recognize the following unit: ", units)
+  }
+
+  rownames(tabd_df) <- tabd_df$target_id
+  tabd_df$target_id <- NULL
+
+  p <- NULL
+  if (nchar(trans) > 0 && !is.null(trans)) {
+    tFunc <- eval(parse(text = trans))
+    p <- ggPlotExpression(as.matrix(tFunc(tabd_df + offset)), clustRows = FALSE)
+  } else {
+    p <- ggPlotExpression(as.matrix(tabd_df), clustRows = FALSE)
+  }
+
+  p
+}
+ggPlotExpression <- function(exMat, clustRows = TRUE, clustCols = TRUE,
+                             rowNames = TRUE, colNames = TRUE) {
+    if (is(exMat, 'matrix')) {
+        exMat <- as.matrix(exMat)
+        stopifnot(class(exMat) == 'matrix')
+    }
+    exMat <- t(exMat)
+    rowOrder <- 1:nrow(exMat)
+    colOrder <- 1:ncol(exMat)
+    if (clustRows)
+        rowOrder <- orderByDendrogram(exMat)
+    if (clustCols)
+        colOrder <- orderByDendrogram(t(exMat))
+    exMat <- exMat[rowOrder, colOrder]
+    meltMat <- reshape2::melt(exMat, varnames = c("x", "y"))
+    breaksM <- round(seq(min(meltMat$value, na.rm = T), max(meltMat$value, na.rm = T),
+                         length.out = 10), 3)
+                         #print(rownames(exMat))
+    if (is.null(colnames(exMat)))
+        colnames(exMat) <- 1:ncol(exMat)
+    meltMat$y <- factor(meltMat$y, levels = colnames(exMat))
+    meltMat$x <- factor(meltMat$x, levels = rownames(exMat))
+    # meltMat <- dplyr::left_join(meltMat, , by = target_id)
+    write.csv(meltMat, "ggplotorder.csv")
+    p <- ggplot(meltMat, aes(x, y, fill = value))
+    p <- p + geom_tile() + scale_fill_gradientn(colours = heat.colors(20),
+          guide = guide_legend(title = "Expression: ",
+                               reverse = T, size = 14))
+    p <- p + theme_bw() + theme(legend.text = element_text(size = 14),
+     legend.title = element_text(size = 14),
+     legend.direction = 'vertical',
+     legend.position = 'top',
+     legend.background = element_rect(colour = "black", size = 0.5, linetype = 1),
+     axis.title = element_blank())
+    if (rowNames)
+        p <- p + theme(axis.text.x = element_text(angle = 90, size = 14))
+    else
+        p <- p + theme(axis.text.x = element_text(size = 0))
+
+    if (colNames)
+        p <- p + theme(axis.text.y = element_text(size = 14))
+    else
+        p <- p + theme(axis.text.y = element_text(size = 0))
+
+    p
+    #list(plot = p, rowOrder = rowOrder, colOrder = colOrder)
+}
+orderByDendrogram <- function(mat) {
+    hc <- hclust(dist(mat))
+    dc <- as.dendrogram(hc)
+    order.dendrogram(dc)
+}
+
+mels <- read.csv("heatmapdocs/melanin.csv")
+
+meldf  <- sopop$obs_norm[sopop$obs_norm$target_id %in% mels$target_id, ]
+meldf <- dplyr::left_join(meldf, mels, by = "target_id")
+logmeldf <- meldf
+logmeldf$est_counts <- log(meldf$est_counts + 1)
+
+logmelorder <- orderByDendrogram(logmeldf)
+
+# this combines all transcripts that have the same gene name...
+ggplot(logmeldf, aes(sample, mel_gene_name)) +
+  geom_tile(aes(fill = est_counts)) +
+  scale_fill_gradient(low = "red3", high = "yellow") +
+  ylab("Genes ") + xlab("") + labs(title = "Melanic genes") +
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size=16),
+        axis.title=element_text(size=14,face="bold"),
+        axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(fill = "Expression level") #+ scale_y_discrete(labels = sort(logmeldf$mel_gene_name))
+
+ggsave("heatmapdocs/melaninmycodeheatmap.png", width = 8.84, height = 8.84)
+# to add white around each tile, add ", color = "white"" within the geom_tile)
+
+
+
+
+mheat <- plot_transcript_heatmap(sopop, mels$target_id, units = "est_counts", trans = "log") + labs(title = "Melanic genes") + theme(plot.title = element_text(hjust = 0)) + theme(legend.position="right") #+ scale_y_discrete(labels = mels$mel_gene_name) 
+mheat
+melteddf <- read.csv("ggplotorder.csv")
+colnames(melteddf)[3] <- "target_id"
+melteddf <- dplyr::left_join(melteddf, mels, by = "target_id")
+melteddf <- melteddf[,c(3,5)]
+melanogenes <- dplyr::distinct(melteddf)
+mheat <- mheat + scale_y_discrete(labels = melanogenes$mel_gene_name)
+mheat
+ggsave("heatmapdocs/melaninmodifiedsleuthcodeheatmap.png", width = 8.84, height = 8.84)
+
+# I need a new way to add in the gene names!!!!! fuck.
+
+
+
+iris <- read.csv("heatmapdocs/iridophore.csv")
+iheat <- plot_transcript_heatmap(sopop, iris$target_id, units = "est_counts", trans = "log") + labs(title = "Iridophore genes") + theme(plot.title = element_text(hjust = 0)) + theme(legend.position="right") #+ scale_y_discrete(labels = iris$iridophore_gene_name)
+iheat
+melteddf <- read.csv("ggplotorder.csv")
+colnames(melteddf)[3] <- "target_id"
+melteddf <- dplyr::left_join(melteddf, iris, by = "target_id")
+melteddf <- melteddf[,c(3,5)]
+iridogenes <- dplyr::distinct(melteddf)
+iheat <- iheat + scale_y_discrete(labels = iridogenes$iridophore_gene_name)
+iheat
+ggsave("heatmapdocs/iridophoremodifiedsleuthcodeheatmap.png", width = 8.84, height = 6.45)
+
+irdf  <- sopop$obs_norm[sopop$obs_norm$target_id %in% iris$target_id, ]
+irdf <- dplyr::left_join(irdf, iris, by = "target_id")
+logirdf <- irdf
+logirdf$est_counts <- log(irdf$est_counts + 1)
+
+
+ggplot(logirdf, aes(sample, iridophore_gene_name)) +
+  geom_tile(aes(fill = est_counts)) +
+  scale_fill_gradient(low = "red3", high = "yellow") +
+  ylab("Genes ") + xlab("") + labs(title = "Iridophore genes") +
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size=16),
+        axis.title=element_text(size=14,face="bold"),
+        axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(fill = "Expression level")
+
+ggsave("heatmapdocs/iridophoremycodeheatmap.png", width = 8.84, height = 8.84)
+
+```
+
 Extract fold changes.
 
 ```{r}
@@ -286,34 +472,10 @@ sopop <- sleuth_wt(sopop, 'San-Felix')
 sopop <- sleuth_wt(sopop, 'Super-Blue')
 bbwalds <- sleuth_results(sopop, 'Blue-Black', test_type = "wt", which_model = "full",
   rename_cols = TRUE, show_all = TRUE)
-bb2bb<- sleuth_results(sopop, 'Blue-Black', test_type = "wt", which_model = "full",
-  rename_cols = TRUE, show_all = TRUE)
-bb2micro <- sleuth_results(sopop, 'Microspot', test_type = "wt", which_model = "full",
-  rename_cols = TRUE, show_all = TRUE)
-bb2sanfel <- sleuth_results(sopop, 'San-Felix', test_type = "wt", which_model = "full",
-  rename_cols = TRUE, show_all = TRUE)
-bb2super <- sleuth_results(sopop, 'Super-Blue', test_type = "wt", which_model = "full",
-  rename_cols = TRUE, show_all = TRUE)
 
+colors_logfold <-dplyr::left_join(sig_colors, bbwalds, by = "target_id")
 
-pop_design <- model.matrix(~0 + samples$morph)
-colnames(pop_design) <- levels(samples$morph)
-
-micro_pop_design <- pop_design[,c(2,3,4,1)]
-sanfel_pop_design <- pop_design[,c(3,4,1,2)]
-
-
-
-sopop <- sleuth_fit(sopop, formula = micro_pop_design, fit_name = "2full")
-sopop <- sleuth_fit(sopop, formula = sanfel_pop_design, fit_name = "3full")
-
-sopop <- sleuth_wt(sopop, 'Microspot', '2full')
-sopop <- sleuth_wt(sopop, 'San-Felix', '2full')
-sopop <- sleuth_wt(sopop, 'Super-Blue', '2full')
-micro2sanfel <- sleuth_results(sopop, 'San-Felix', test_type = "wt", which_model = "2full",
-  rename_cols = TRUE, show_all = TRUE)
-micro2super <- sleuth_results(sopop, 'Super-Blue', test_type = "wt", which_model = "2full",
-  rename_cols = TRUE, show_all = TRUE)
+write.csv(colors_logfold, "fullcolorswithlogfold.csv")
 
 ```
 
@@ -340,42 +502,6 @@ for (i in morphs){
   effect_sizes <- merge(effect_sizes, tmp, by = "target_id")
 }
 
-
-# get est? idk man.
-kaltab <- kallisto_table(sopop)
-
-eh <- kaltab %>% group_by(target_id, morph) %>% summarise(counts = mean(est_counts)) 
-# get unique rows????
-
-eh2 <- kaltab %>% group_by(target_id, morph) %>% summarise(error = sd(est_counts))
-
-eh3 <- dplyr::bind_cols(eh,eh2)
-
-
-
-###left off here, quick for loop to make shit happen with combining columns or some shit.
-
-
-
-
-
-iris %>%
- group_by(Species) %>%
- summarise(avg = mean(Sepal.Width)) %>%
- arrange(avg)
-
-effect_sizes <- dplyr::inner_join(
-  dplyr::select(dplyr::filter(full_model, term == 'Blue-Black'),
-    target_id, full_estimate = estimate),
-  dplyr::select(dplyr::filter(reduced_model, term == 'Blue-Black'),
-    target_id, reduced_estimate = estimate),
-  by = 'target_id'
-  )
-
-dplyr::inner_join(
-  dplyr::select(top_different[1:10, ], target_id),
-  effect_sizes,
-  by = 'target_id')
 
 ```
 
