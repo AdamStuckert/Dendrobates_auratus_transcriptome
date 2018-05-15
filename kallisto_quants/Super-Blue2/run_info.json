@@ -1,9 +1,0 @@
-{
-	"n_targets": 160613,
-	"n_bootstraps": 100,
-	"n_processed": 3204237,
-	"kallisto_version": "0.43.0",
-	"index_version": 10,
-	"start_time": "Fri Mar 30 09:23:58 2018",
-	"call": "kallisto quant -i /home/summersk/auratus/new_auratus.idx -o new_kallisto_quants/Super-Blue2 -b 100 Super-Blue2_TRIM_1P.cor.fq Super-Blue2_TRIM_2P.cor.fq"
-}
