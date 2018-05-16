@@ -1,0 +1,8 @@
+1	synapse (GO:0045202)	7	0.5%	0.5%
+2	cell junction (GO:0030054)	14	0.9%	1.0%
+3	membrane (GO:0016020)	161	10.4%	11.4%
+4	macromolecular complex (GO:0032991)	198	12.8%	14.0%
+5	extracellular matrix (GO:0031012)	14	0.9%	1.0%
+6	cell part (GO:0044464)	576	37.1%	40.8%
+7	organelle (GO:0043226)	397	25.6%	28.1%
+8	extracellular region (GO:0005576)	44	2.8%	3.1%
