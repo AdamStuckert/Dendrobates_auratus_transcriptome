@@ -87,12 +87,6 @@ ensembl=useMart("ensembl")
 
 ```{r}
 
-# First download the  annotation from linux/enrique
-ann <- read.table("newallpep_tophit.txt", header = FALSE, fill = TRUE)
-colnames(ann)[c(1:12)] <- c("transcript_id", "peptide_id", "percentage_id_matches",
-                              "alignment_length", "number_mismatches", "number_gap_openings",
-                              "query_start", "query_end", "alignment_start", "alignment_end",
-                              "expected_value", "bitscore")
 
 ### Load the annotation data
 # Xenopus
@@ -117,18 +111,40 @@ a2g <- rbind(x2g, n2g, u2g)
 
 a2g$gene_name <- tolower(a2g$gene_name)
 
-xen <- ann[,c(1:2)]
+# First download the  annotation from linux/enrique
+ann <- read.table("newallpep_tophit.txt", header = FALSE, fill = TRUE)
+colnames(ann)[c(1:12)] <- c("transcript_id", "peptide_id", "percentage_id_matches",
+                              "alignment_length", "number_mismatches", "number_gap_openings",
+                              "query_start", "query_end", "alignment_start", "alignment_end",
+                              "expected_value", "bitscore")
 
 
-biggie <- dplyr::left_join(xen, a2g, by = "peptide_id")
-colnames(biggie)[1] <- "target_id"
+ann <- ann[,c(1:2,11)]
+ann <- dplyr::left_join(ann, a2g, by = "peptide_id")
+colnames(ann) <- c("target_id", "full_peptide_id", "full_evalue", "full_gene_name")
+
+# Xenopus annotation 
+xen <- read.table("newxen_tophit.txt", header = FALSE, fill = TRUE)
+colnames(xen)[c(1:12)] <- c("transcript_id", "peptide_id", "percentage_id_matches",
+                              "alignment_length", "number_mismatches", "number_gap_openings",
+                              "query_start", "query_end", "alignment_start", "alignment_end",
+                              "expected_value", "bitscore")
+
+
+xen <- xen[,c(1:2,11)]
+
+xen <- dplyr::left_join(xen, a2g, by = "peptide_id")
+colnames(xen) <- c("target_id", "xen_peptide_id", "xen_evalue", "xen_gene_name")
+
+anno <- dplyr::left_join(ann, xen, by = "target_id")
+
+
 
 pop_design <- model.matrix(~0 + samples$morph)
 colnames(pop_design) <- levels(samples$morph)
 
 
-
-sopop <- sleuth_prep(samples, full_model = pop_design, num_cores = 6, target_mapping = biggie)
+sopop <- sleuth_prep(samples, full_model = pop_design, num_cores = 6, target_mapping = anno)
 
 sopop <- sleuth_fit(sopop, formula = pop_design, fit_name = "full")
 sopop <- sleuth_fit(sopop, formula = ~ 1, fit_name = "reduced")
@@ -224,8 +240,8 @@ pc2 <- pc2[,-2]
 Get the significant ones, and only those that are classified as "genes" with an external gene name. I'm going to load this into GOrilla for now.
 
 ```{R}
-GO <- dplyr::filter(pop_siggies, gene_name != "NA")
-GO <- dplyr::filter(GO, gene_name != "")
+GO <- dplyr::filter(pop_siggies, full_gene_name != "NA")
+GO <- dplyr::filter(GO, full_gene_name != "")
 
 write.csv(GO, "all_peptides_genes4GOrilla.csv")
 ```
@@ -242,17 +258,21 @@ colnames(colors)[1] <- "gene_name"
 # Make them all lower case...
 colors$gene_name <- tolower(colors$gene_name)
 
-pop_lrt_results$gene_name <- tolower(pop_lrt_results$gene_name)
-colors <- dplyr::left_join(colors, pop_lrt_results, by = "gene_name")
+pop_lrt_results$full_gene_name <- tolower(pop_lrt_results$full_gene_name)
+pop_lrt_results$xen_gene_name <- tolower(pop_lrt_results$xen_gene_name)
 
-## Order them by 'significance'
-colors <-  colors[order(colors$gene_name),]
+pop_lrt_colors <- pop_lrt_results %>% filter(full_gene_name %in% colors$gene_name | xen_gene_name %in% colors$gene_name)
+
+#colors <- dplyr::left_join(colors, pop_lrt_results, by = "gene_name")
+
+## Alphabetize
+pop_lrt_colors <-  pop_lrt_colors[order(pop_lrt_colors$full_gene_name),]
 
 # Drop color genes that don't have an associated transcript
-colors <- dplyr::filter(colors, target_id != "NA")
+pop_lrt_colors <- dplyr::filter(pop_lrt_colors, target_id != "NA")
 
 ## These are just the 'statistically significant' hits
-sig_colors <- dplyr::filter(colors, qval < 0.05)
+sig_colors <- dplyr::filter(pop_lrt_colors, qval < 0.05)
 
 
 
@@ -360,7 +380,7 @@ ggPlotExpression <- function(exMat, clustRows = TRUE, clustCols = TRUE,
     # meltMat <- dplyr::left_join(meltMat, , by = target_id)
     write.csv(meltMat, "ggplotorder.csv")
     p <- ggplot(meltMat, aes(x, y, fill = value))
-    p <- p + geom_tile() + scale_fill_gradientn(colours = heat.colors(20),
+    p <- p + geom_tile() + scale_fill_gradient(low = "yellow", high = "red3",
           guide = guide_legend(title = "Expression: ",
                                reverse = T, size = 14))
     p <- p + theme_bw() + theme(legend.text = element_text(size = 14),
@@ -415,7 +435,7 @@ ggsave("heatmapdocs/melaninmycodeheatmap.png", width = 8.84, height = 8.84)
 
 
 
-mheat <- plot_transcript_heatmap(sopop, mels$target_id, units = "est_counts", trans = "log") + labs(title = "Melanic genes") + theme(plot.title = element_text(hjust = 0)) + theme(legend.position="right") #+ scale_y_discrete(labels = mels$mel_gene_name) 
+mheat <- plot_transcript_heatmap(sopop, mels$target_id, units = "tpm", trans = "log") + labs(title = "Melanic genes") + theme(plot.title = element_text(hjust = 0)) + theme(legend.position="right") #+ scale_y_discrete(labels = mels$mel_gene_name) 
 mheat
 melteddf <- read.csv("ggplotorder.csv")
 colnames(melteddf)[3] <- "target_id"
@@ -426,12 +446,11 @@ mheat <- mheat + scale_y_discrete(labels = melanogenes$mel_gene_name)
 mheat
 ggsave("heatmapdocs/melaninmodifiedsleuthcodeheatmap.png", width = 8.84, height = 8.84)
 
-# I need a new way to add in the gene names!!!!! fuck.
 
 
 
 iris <- read.csv("heatmapdocs/iridophore.csv")
-iheat <- plot_transcript_heatmap(sopop, iris$target_id, units = "est_counts", trans = "log") + labs(title = "Iridophore genes") + theme(plot.title = element_text(hjust = 0)) + theme(legend.position="right") #+ scale_y_discrete(labels = iris$iridophore_gene_name)
+iheat <- plot_transcript_heatmap(sopop, iris$target_id, units = "tpm", trans = "log") + labs(title = "Iridophore genes") + theme(plot.title = element_text(hjust = 0)) + theme(legend.position="right") #+ scale_y_discrete(labels = iris$iridophore_gene_name)
 iheat
 melteddf <- read.csv("ggplotorder.csv")
 colnames(melteddf)[3] <- "target_id"
@@ -508,10 +527,8 @@ for (i in morphs){
 
 
 
-We ended up losing some of the color specific genes, I assume because there was a *slightly better* mapping to either *Rana* or *Nanorana*, so we will do the same as above, but just with the *Xenopus* annotation to try and recover those color genes. It seems like there could be a way to combine these programmatically, but this is just a first pass.
 
-
-```{r}
+```{r, eval = FALSE}
 colors <- read.csv("color_genes.csv")
 colnames(colors)[1] <- "gene_name"
 
