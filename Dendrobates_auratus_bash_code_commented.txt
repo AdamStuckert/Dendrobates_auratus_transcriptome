@@ -225,3 +225,33 @@ sort newxen2allpep.m8 -k 1,1 -k11,11g | sort -u -k 1,1 --merge > newxen_tophit.t
 ## This approach yields 47% annotation rate
 
 sort tmp.txt -k 1,1 -k11,11g | sort -u -k 1,1 --merge > tmp2.txt
+
+
+# Filter out transcripts in the transcriptome that match to *Dendrbobates spp* mtDNA
+# Data downloaded from NCBI, from Lyra et al 2017, The mitochondrial genomes of three species of poison frogs (Anura: Dendrobates)
+
+cd 
+cd mtDNA_Dendrobates
+cat * > Dendrobates_mtDNA.fa
+# make the blast database
+makeblastdb -in Dendrobates_mtDNA.fa -dbtype nucl -parse_seqids	
+# move in to the appropriate folder and run blast
+cd /home/summersk/mtDNA_Dendrobates
+blastn -db /home/summersk/mtDNA_Dendrobates/Dendrobates_mtDNA.fa -query good.auratus2.renamed.fasta -out mtDNAquery -outfmt 6 -num_threads 50
+
+# only 91 transcripts map to mtDNA, so I'm not concerned about that.
+
+# why don't we have mc1r?
+cd ~/mc1r_seqs #contains sequences from Ranitomeya imitator and Oophaga histrionica
+cat * > all_mc1r_seqs.fa
+
+  makeblastdb -in all_mc1r_seqs.fa -dbtype nucl -parse_seqids	
+
+# move in to the appropriate folder and run blast
+cd /home/summersk/auratus
+blastn -db /home/summersk/mc1r_seqs/all_mc1r_seqs.fa -query good.auratus2.renamed.fasta -out mc1r_query -outfmt 6 -num_threads 50
+sort mc1r_query -k 1,1 -k11,11g | sort -u -k 1,1 --merge > mc1r_tophit.txt
+
+# search by the transcript id...
+seqs=$(awk '{print $1}' mc1r_tophit.txt)
+for i in $seqs; do grep $i newallpep_tophit.txt; done
