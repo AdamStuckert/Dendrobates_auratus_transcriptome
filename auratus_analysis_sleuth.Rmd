@@ -312,6 +312,19 @@ ggsave("Figure6_lef1.png", width = 6.81, height = 3.99)
 ```
 
 
+Make a figure to see the expression of mc1r (acquired from Tyler Linderoth's exome capture).
+
+```{r}
+mc1r <- dplyr::filter(sopop$obs_norm, target_id == "Transcript_14665")
+mc1r <- dplyr::full_join(sopop$sample_to_covariates, mc1r, by = 'sample')
+
+mc1rfig <- ggplot(mc1r, aes(x=morph, y=tpm)) + xlab("Morph") + ylab("Transcripts per million") + geom_jitter(aes(size = 3, color = morph), width = 0.2, height = 0) + scale_colour_manual(values = c("navyblue","forestgreen","tan3","dodgerblue"), guide = guide_legend(title = "Color morph", override.aes = list(size=4))) +  geom_smooth(method = loess) + ggtitle("Melanocortin Receptor 1") + guides(size=FALSE) + theme_bw() + theme(panel.grid.major = element_blank())
+
+mc1rfig
+ 
+ggsave("mc1r.png", width = 6.81, height = 3.99)
+```
+
 Make a heatmap of the melanin-related genes for the ms:
 
 ```{r}
