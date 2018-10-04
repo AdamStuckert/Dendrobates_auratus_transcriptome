@@ -394,7 +394,7 @@ ggPlotExpression <- function(exMat, clustRows = TRUE, clustCols = TRUE,
     write.csv(meltMat, "ggplotorder.csv")
     p <- ggplot(meltMat, aes(x, y, fill = value))
     p <- p + geom_tile() + scale_fill_gradient(low = "yellow", high = "red3",
-          guide = guide_legend(title = "Expression: ",
+          guide = guide_legend(title = "Log expression: ",
                                reverse = T, size = 14))
     p <- p + theme_bw() + theme(legend.text = element_text(size = 14),
      legend.title = element_text(size = 14),
@@ -681,6 +681,12 @@ Make some figures from Panther:
 bio <- read.csv("panther/panther-biologicalprocesses.csv")
 cell <- read.csv("panther/panther-cellularcomponent.csv")
 mol <- read.csv("panther/panther-molecularfunction.csv")
+
+# remove (GO:##)
+bio$Category_name <- gsub("\\(GO:\\d+\\)",  "", bio$Category_name)
+cell$Category_name <- gsub("\\(GO:\\d+\\)",  "", cell$Category_name)
+mol$Category_name <- gsub("\\(GO:\\d+\\)",  "", mol$Category_name)
+
 
 # make a theme
 pietheme <- theme(axis.text = element_blank(), axis.ticks = element_blank(), panel.grid  = element_blank())
