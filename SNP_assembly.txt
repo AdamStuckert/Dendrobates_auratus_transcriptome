@@ -1,0 +1,482 @@
+BLUEBLACK
+
+1298 1403 1412 1468 1757 1763 1826 1860
+
+C C A C G C C C
+
+./rewrite_seqs.py pgm2.fa Blue-black bb_pos.txt bb_nuc.txt bb_pgm2.fa
+
+SUPERBLUE
+
+1298 1403 1412 1468 1757 1763 1826 1860
+
+T T G T A T T T
+
+./rewrite_seqs.py pgm2.fa Super-blue sb_pos.txt sb_nuc.txt sb_pgm2.fa
+
+MICROSPOT
+
+1298 1403 1412 1468 1757 1763 1826 1860
+
+C C A C A T C C
+
+
+./rewrite_seqs.py pgm2.fa Microspot ms_pos.txt ms_nuc.txt ms_pgm2.fa
+
+SANFELIX
+
+1298 1403 1412 1468 1757 1763 1826 1860
+
+
+C C A C A T C C
+
+./rewrite_seqs.py pgm2.fa San-Felix sf_pos.txt sf_nuc.txt sf_pgm2.fa
+
+cat pgm2.fa bb_pgm2.fa sb_pgm2.fa ms_pgm2.fa sf_pgm2.fa > combined_pgm2.fa
+
+
+############## SRM #####################
+
+grep "Transcript_20662" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/srm.fa
+
+BB
+1032	A
+
+./rewrite_seqs.py srm.fa Blue-black bb_pos.txt bb_nuc.txt bb_srm.fa
+
+MICRO
+1032	A
+
+./rewrite_seqs.py srm.fa Microspot ms_pos.txt ms_nuc.txt ms_srm.fa
+
+SanFelix
+1032	G
+
+./rewrite_seqs.py srm.fa San-Felix sf_pos.txt sf_nuc.txt sf_srm.fa
+
+SUPER
+1032	A
+
+./rewrite_seqs.py srm.fa Super-Blue sb_pos.txt sb_nuc.txt sb_srm.fa
+
+cat srm.fa bb_srm.fa ms_srm.fa sf_srm.fa sb_srm.fa > combined_srm.fa
+
+
+############## RAB7A #####################
+grep "Transcript_32551" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/rab7a.fa
+
+echo 1189 > rab_pos.txt
+BB
+1189	C
+echo C > bb_nuc.txt
+./rewrite_seqs.py rab7a.fa Blue-black rab_pos.txt bb_nuc.txt bb_rab7a.fa
+
+MICRO
+1189	N
+echo N > ms_nuc.txt
+./rewrite_seqs.py rab7a.fa Microspot rab_pos.txt ms_nuc.txt ms_rab7a.fa
+
+SanFelix
+1189	G
+echo G > bsf_nuc.txt
+./rewrite_seqs.py rab7a.fa San-Felix rab_pos.txt sf_nuc.txt sf_rab7a.fa
+
+SUPER
+1189	C
+echo C > sb_nuc.txt
+./rewrite_seqs.py rab7a.fa Super-Blue rab_pos.txt sb_nuc.txt sb_rab7a.fa
+
+cat rab7a.fa bb_rab7a.fa ms_rab7a.fa sf_rab7a.fa sb_rab7a.fa > combined_rab7a.fa
+
+
+
+
+############## ebna1bp2 #####################
+cd ..
+grep "Transcript_60759" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/ebna1bp2.fa
+cd popgen_py/
+echo 139 > ebna1bp2_pos.txt
+
+BB
+
+echo T > bb_nuc.txt
+./rewrite_seqs.py ebna1bp2.fa Blue-black ebna1bp2_pos.txt bb_nuc.txt bb_ebna1bp2.fa
+
+MICRO
+1189	G
+echo N > ms_nuc.txt
+./rewrite_seqs.py ebna1bp2.fa Microspot ebna1bp2_pos.txt ms_nuc.txt ms_ebna1bp2.fa
+
+SanFelix
+1189	T
+echo G > sf_nuc.txt
+./rewrite_seqs.py ebna1bp2.fa San-Felix ebna1bp2_pos.txt sf_nuc.txt sf_ebna1bp2.fa
+
+SUPER
+1189	G
+echo C > sb_nuc.txt
+./rewrite_seqs.py ebna1bp2.fa Super-Blue ebna1bp2_pos.txt sb_nuc.txt sb_ebna1bp2.fa
+
+cat ebna1bp2.fa bb_ebna1bp2.fa ms_ebna1bp2.fa sf_ebna1bp2.fa sb_ebna1bp2.fa > combined_ebna1bp2.fa
+
+
+
+############## atp12a #####################
+cd ..
+grep "Transcript_62750" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/atp12a.fa
+cd popgen_py/
+echo 1414 > atp12a_pos.txt
+
+BB
+
+echo T > bb_nuc.txt
+./rewrite_seqs.py atp12a.fa Blue-black atp12a_pos.txt bb_nuc.txt bb_atp12a.fa
+
+MICRO
+1189	C
+echo N > ms_nuc.txt
+./rewrite_seqs.py atp12a.fa Microspot atp12a_pos.txt ms_nuc.txt ms_atp12a.fa
+
+SanFelix
+1189	T
+echo G > sf_nuc.txt
+./rewrite_seqs.py atp12a.fa San-Felix atp12a_pos.txt sf_nuc.txt sf_atp12a.fa
+
+SUPER
+1189	T
+echo C > sb_nuc.txt
+./rewrite_seqs.py atp12a.fa Super-Blue atp12a_pos.txt sb_nuc.txt sb_atp12a.fa
+
+cat atp12a.fa bb_atp12a.fa ms_atp12a.fa sf_atp12a.fa sb_atp12a.fa > combined_atp12a.fa
+
+
+############## rlbp1 #####################
+cd ..
+grep "Transcript_79672" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/rlbp1.fa
+cd popgen_py/
+echo 995 > rlbp1_pos.txt
+
+# BB
+
+echo A > bb_nuc.txt
+./rewrite_seqs.py rlbp1.fa Blue-black rlbp1_pos.txt bb_nuc.txt bb_rlbp1.fa
+
+# MICRO
+
+echo G > ms_nuc.txt
+./rewrite_seqs.py rlbp1.fa Microspot rlbp1_pos.txt ms_nuc.txt ms_rlbp1.fa
+
+# SanFelix
+
+echo A > sf_nuc.txt
+./rewrite_seqs.py rlbp1.fa San-Felix rlbp1_pos.txt sf_nuc.txt sf_rlbp1.fa
+
+# SUPER
+
+echo A > sb_nuc.txt
+./rewrite_seqs.py rlbp1.fa Super-Blue rlbp1_pos.txt sb_nuc.txt sb_rlbp1.fa
+
+cat rlbp1.fa bb_rlbp1.fa ms_rlbp1.fa sf_rlbp1.fa sb_rlbp1.fa > combined_rlbp1.fa
+
+
+
+############## rtf1 #####################
+cd ..
+grep "Transcript_82413" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/rtf1.fa
+cd popgen_py/
+echo 229 454 > rtf1_pos.txt
+
+# BB
+
+echo A A > bb_nuc.txt
+./rewrite_seqs.py rtf1.fa Blue-black rtf1_pos.txt bb_nuc.txt bb_rtf1.fa
+
+# MICRO
+
+echo T G > ms_nuc.txt
+./rewrite_seqs.py rtf1.fa Microspot rtf1_pos.txt ms_nuc.txt ms_rtf1.fa
+
+# SanFelix
+
+echo T G > sf_nuc.txt
+./rewrite_seqs.py rtf1.fa San-Felix rtf1_pos.txt sf_nuc.txt sf_rtf1.fa
+
+# SUPER
+
+echo A A > sb_nuc.txt
+./rewrite_seqs.py rtf1.fa Super-Blue rtf1_pos.txt sb_nuc.txt sb_rtf1.fa
+
+cat rtf1.fa bb_rtf1.fa ms_rtf1.fa sf_rtf1.fa sb_rtf1.fa > combined_rtf1.fa
+
+
+############## prtfdc1 #####################
+cd ..
+grep "Transcript_100967" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/prtfdc1.fa
+cd popgen_py/
+echo 1181 1300 > prtfdc1_pos.txt
+
+# BB
+
+echo A C > bb_nuc.txt
+./rewrite_seqs.py prtfdc1.fa Blue-black prtfdc1_pos.txt bb_nuc.txt bb_prtfdc1.fa
+
+# MICRO
+
+echo A C > ms_nuc.txt
+./rewrite_seqs.py prtfdc1.fa Microspot prtfdc1_pos.txt ms_nuc.txt ms_prtfdc1.fa
+
+# SanFelix
+
+echo G T > sf_nuc.txt
+./rewrite_seqs.py prtfdc1.fa San-Felix prtfdc1_pos.txt sf_nuc.txt sf_prtfdc1.fa
+
+# SUPER
+
+echo G T > sb_nuc.txt
+./rewrite_seqs.py prtfdc1.fa Super-Blue prtfdc1_pos.txt sb_nuc.txt sb_prtfdc1.fa
+
+cat prtfdc1.fa bb_prtfdc1.fa ms_prtfdc1.fa sf_prtfdc1.fa sb_prtfdc1.fa > combined_prtfdc1.fa
+
+
+
+############## cno #####################
+cd ..
+grep "Transcript_109064" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/cno.fa
+cd popgen_py/
+echo 368 > cno_pos.txt
+
+# BB
+
+echo T > bb_nuc.txt
+./rewrite_seqs.py cno.fa Blue-black cno_pos.txt bb_nuc.txt bb_cno.fa
+
+# MICRO
+
+echo T > ms_nuc.txt
+./rewrite_seqs.py cno.fa Microspot cno_pos.txt ms_nuc.txt ms_cno.fa
+
+# SanFelix
+
+echo C > sf_nuc.txt
+./rewrite_seqs.py cno.fa San-Felix cno_pos.txt sf_nuc.txt sf_cno.fa
+
+# SUPER
+
+echo T > sb_nuc.txt
+./rewrite_seqs.py cno.fa Super-Blue cno_pos.txt sb_nuc.txt sb_cno.fa
+
+cat cno.fa bb_cno.fa ms_cno.fa sf_cno.fa sb_cno.fa > combined_cno.fa
+
+
+
+############## map2k1 #####################
+cd ..
+grep "Transcript_122714" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/map2k1.fa
+cd popgen_py/
+echo 1536 > map2k1_pos.txt
+
+# BB
+
+echo C > bb_nuc.txt
+./rewrite_seqs.py map2k1.fa Blue-black map2k1_pos.txt bb_nuc.txt bb_map2k1.fa
+
+# MICRO
+
+echo C > ms_nuc.txt
+./rewrite_seqs.py map2k1.fa Microspot map2k1_pos.txt ms_nuc.txt ms_map2k1.fa
+
+# SanFelix
+
+echo T > sf_nuc.txt
+./rewrite_seqs.py map2k1.fa San-Felix map2k1_pos.txt sf_nuc.txt sf_map2k1.fa
+
+# SUPER
+
+echo T > sb_nuc.txt
+./rewrite_seqs.py map2k1.fa Super-Blue map2k1_pos.txt sb_nuc.txt sb_map2k1.fa
+
+cat map2k1.fa bb_map2k1.fa ms_map2k1.fa sf_map2k1.fa sb_map2k1.fa > combined_map2k1.fa
+
+
+
+############## chm #####################
+cd ..
+grep "Transcript_131857" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/chm.fa
+cd popgen_py/
+echo 1361 > chm_pos.txt
+
+# BB
+
+echo T > bb_nuc.txt
+./rewrite_seqs.py chm.fa Blue-black chm_pos.txt bb_nuc.txt bb_chm.fa
+
+# MICRO
+
+echo C > ms_nuc.txt
+./rewrite_seqs.py chm.fa Microspot chm_pos.txt ms_nuc.txt ms_chm.fa
+
+# SanFelix
+
+echo T > sf_nuc.txt
+./rewrite_seqs.py chm.fa San-Felix chm_pos.txt sf_nuc.txt sf_chm.fa
+
+# SUPER
+
+echo T > sb_nuc.txt
+./rewrite_seqs.py chm.fa Super-Blue chm_pos.txt sb_nuc.txt sb_chm.fa
+
+cat chm.fa bb_chm.fa ms_chm.fa sf_chm.fa sb_chm.fa > combined_chm.fa
+
+
+
+############## pts #####################
+cd ..
+grep "Transcript_133853" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/pts.fa
+cd popgen_py/
+echo 3935 > pts_pos.txt
+
+# BB
+
+echo C > bb_nuc.txt
+./rewrite_seqs.py pts.fa Blue-black pts_pos.txt bb_nuc.txt bb_pts.fa
+
+# MICRO
+
+echo T > ms_nuc.txt
+./rewrite_seqs.py pts.fa Microspot pts_pos.txt ms_nuc.txt ms_pts.fa
+
+# SanFelix
+
+echo C > sf_nuc.txt
+./rewrite_seqs.py pts.fa San-Felix pts_pos.txt sf_nuc.txt sf_pts.fa
+
+# SUPER
+
+echo T > sb_nuc.txt
+./rewrite_seqs.py pts.fa Super-Blue pts_pos.txt sb_nuc.txt sb_pts.fa
+
+cat pts.fa bb_pts.fa ms_pts.fa sf_pts.fa sb_pts.fa > combined_pts.fa
+
+
+
+############## atox1 #####################
+cd ..
+grep "Transcript_135297" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/atox1.fa
+cd popgen_py/
+echo 381 > atox1_pos.txt
+
+# BB
+
+echo T > bb_nuc.txt
+./rewrite_seqs.py atox1.fa Blue-black atox1_pos.txt bb_nuc.txt bb_atox1.fa
+
+# MICRO
+
+echo T > ms_nuc.txt
+./rewrite_seqs.py atox1.fa Microspot atox1_pos.txt ms_nuc.txt ms_atox1.fa
+
+# SanFelix
+
+echo G > sf_nuc.txt
+./rewrite_seqs.py atox1.fa San-Felix atox1_pos.txt sf_nuc.txt sf_atox1.fa
+
+# SUPER
+
+echo T > sb_nuc.txt
+./rewrite_seqs.py atox1.fa Super-Blue atox1_pos.txt sb_nuc.txt sb_atox1.fa
+
+cat atox1.fa bb_atox1.fa ms_atox1.fa sf_atox1.fa sb_atox1.fa > combined_atox1.fa
+
+
+
+############## atp12a #####################
+cd ..
+grep "Transcript_145727" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/atp12a.fa
+cd popgen_py/
+echo 3833 > atp12a_pos.txt
+
+# BB
+
+echo T > bb_nuc.txt
+./rewrite_seqs.py atp12a.fa Blue-black atp12a_pos.txt bb_nuc.txt bb_atp12a.fa
+
+# MICRO
+
+echo C > ms_nuc.txt
+./rewrite_seqs.py atp12a.fa Microspot atp12a_pos.txt ms_nuc.txt ms_atp12a.fa
+
+# SanFelix
+
+echo C > sf_nuc.txt
+./rewrite_seqs.py atp12a.fa San-Felix atp12a_pos.txt sf_nuc.txt sf_atp12a.fa
+
+# SUPER
+
+echo T > sb_nuc.txt
+./rewrite_seqs.py atp12a.fa Super-Blue atp12a_pos.txt sb_nuc.txt sb_atp12a.fa
+
+cat atp12a.fa bb_atp12a.fa ms_atp12a.fa sf_atp12a.fa sb_atp12a.fa > combined_atp12a_second.fa
+
+
+
+############## pcbd1 #####################
+cd ..
+grep "Transcript_158844" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/pcbd1.fa
+cd popgen_py/
+echo 208 > pcbd1_pos.txt
+
+# BB
+
+echo C > bb_nuc.txt
+./rewrite_seqs.py pcbd1.fa Blue-black pcbd1_pos.txt bb_nuc.txt bb_pcbd1.fa
+
+# MICRO
+
+echo A > ms_nuc.txt
+./rewrite_seqs.py pcbd1.fa Microspot pcbd1_pos.txt ms_nuc.txt ms_pcbd1.fa
+
+# SanFelix
+
+echo A > sf_nuc.txt
+./rewrite_seqs.py pcbd1.fa San-Felix pcbd1_pos.txt sf_nuc.txt sf_pcbd1.fa
+
+# SUPER
+
+echo A > sb_nuc.txt
+./rewrite_seqs.py pcbd1.fa Super-Blue pcbd1_pos.txt sb_nuc.txt sb_pcbd1.fa
+
+cat pcbd1.fa bb_pcbd1.fa ms_pcbd1.fa sf_pcbd1.fa sb_pcbd1.fa > combined_pcbd1.fa
+
+
+
+############## dio2 #####################
+cd ..
+grep "Transcript_160492" -A 1 Dendrobates_auratus_transcriptome.fasta > popgen_py/dio2.fa
+cd popgen_py/
+echo 965 > dio2_pos.txt
+
+# BB
+
+echo A > bb_nuc.txt
+./rewrite_seqs.py dio2.fa Blue-black dio2_pos.txt bb_nuc.txt bb_dio2.fa
+
+# MICRO
+
+echo A > ms_nuc.txt
+./rewrite_seqs.py dio2.fa Microspot dio2_pos.txt ms_nuc.txt ms_dio2.fa
+
+# SanFelix
+
+echo G > sf_nuc.txt
+./rewrite_seqs.py dio2.fa San-Felix dio2_pos.txt sf_nuc.txt sf_dio2.fa
+
+# SUPER
+
+echo G > sb_nuc.txt
+./rewrite_seqs.py dio2.fa Super-Blue dio2_pos.txt sb_nuc.txt sb_dio2.fa
+
+cat dio2.fa bb_dio2.fa ms_dio2.fa sf_dio2.fa sb_dio2.fa > combined_dio2.fa
+
+
+
+scp summersk@150.216.83.24:/home/summersk/auratus/popgen_py/combined*.fa .

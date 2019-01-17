@@ -1,0 +1,76 @@
+#!/bin/bash
+
+WD=$(pwd)
+TRANSCRIPTOME=$"Dendrobates_auratus_transcriptome.fasta"
+PICARD=$"/home/summersk/programs/picard-2.18.5/picard.jar"
+ANGSD=$"/home/summersk/programs/angsd/angsd"
+cd rcorr/
+SAMPLES=$(ls *1P.cor.fq | sed "s/_1P.cor.fq//g")
+cd ..
+
+echo Working with the transcriptome: $TRANSCRIPTOME
+echo Working with the following samples: $SAMPLES
+
+# create an BWA index from the reference transcriptome
+bwa index $TRANSCRIPTOME
+
+# mkdir bamfiles/ 
+
+# Map individual samples to reference transcriptome using BWA
+for i in $SAMPLES
+do 
+bwa mem $TRANSCRIPTOME -t 12 \
+rcorr/${i}_1P.cor.fq \
+rcorr/${i}_2P.cor.fq > ../bamfiles/${i}.sam 
+done
+
+cd bamfiles/
+
+# run picard to produce sorted sam files
+parallel -j 4 java -jar $PICARD SortSam INPUT={}.sam OUTPUT={}_sorted_reads.bam SORT_ORDER=coordinate ::: $SAMPLES
+
+# Add group information to files
+sorted=$(ls *_sorted_reads.bam | sed "s/_sorted_reads.bam//g")
+parallel -j 4 java -jar $PICARD AddOrReplaceReadGroups  I={}_sorted_reads.bam O={}_marked_groups.bam RGLB=lib1 RGPL=illumina RGPU=unit1 RGSM={} ::: $SAMPLES
+
+# Mark duplicates here
+marked=$(ls *_marked_groups.bam | sed "s/_marked_groups.bam//g")
+parallel -j 4 java -jar $PICARD MarkDuplicates INPUT={}_marked_groups.bam OUTPUT={}_dedup_reads.bam METRICS_FILE={}_metrics.txt REMOVE_DUPLICATES=true MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=500 ::: $marked  
+
+cd bamfiles/
+
+# sample list file for angsd
+forangsd=$(ls *_dedup_reads.bam)
+for i in $forangsd
+do
+echo $i
+done > samples4angsd.txt
+
+### global angsd!
+$ANGSD -b samples4angsd.txt -anc ${WD}/bamfiles/${TRANSCRIPTOME} -out angsd_global -P 24 -SNP_pval 1e-6 -minMapQ 20 -minQ 20 -setMinDepth 100 -setMaxDepth 6000 -minMaf 0.01 -GL 1 -doMaf 1 -doMajorMinor 1 -doGlf 3 -doPost 1 -doVcf 1 -doCounts 1 -doDepth 1 -dumpCounts 1 -dosaf 1 
+
+
+# Make a SNP list with major
+gunzip angsd_global.mafs.gz
+cut -f 1,2,3,4 angsd_global.mafs | tail -n +2 > angsd_global_snplist.txt
+
+# index the sites
+$ANGSD sites index angsd_global_snplist.txt
+
+
+# run for each population
+cat samples4angsd.txt | grep Blue-Black > Blueblack4angsd.txt
+cat samples4angsd.txt | grep Microspot > Microspot4angsd.txt
+cat samples4angsd.txt | grep San-Felix > SanFelix4angsd.txt
+cat samples4angsd.txt | grep Super-Blue > Superblue4angsd.txt
+
+
+$ANGSD -b Blueblack4angsd.txt -anc $TRANSCRIPTOME -out angsd_Blueblack_calling -P 8 -setMaxDepth 6000 -GL 1 -doMaf 1 -doMajorMinor 3 -doGlf 3 -doPost 1 -doVcf 1 -doCounts 1 -doDepth 1 -dumpCounts 1 -dosaf 1 -sites angsd_global_snplist.txt -minMapQ 20 -minQ 20 >& Blueblack.log &
+
+$ANGSD -b Microspot4angsd.txt -anc $TRANSCRIPTOME -out angsd_Microspot_calling -P 8 -setMaxDepth 6000 -GL 1 -doMaf 1 -doMajorMinor 3 -doGlf 3 -doPost 1 -doVcf 1 -doCounts 1 -doDepth 1 -dumpCounts 1 -dosaf 1 -sites angsd_global_snplist.txt -minMapQ 20 -minQ 20 >& Microspot.log &
+
+$ANGSD -b SanFelix4angsd.txt -anc $TRANSCRIPTOME -out angsd_SanFelix_calling -P 8 -setMaxDepth 6000 -GL 1 -doMaf 1 -doMajorMinor 3 -doGlf 3 -doPost 1 -doVcf 1 -doCounts 1 -doDepth 1 -dumpCounts 1 -dosaf 1 -sites angsd_global_snplist.txt -minMapQ 20 -minQ 20 >& SanFelix.log &
+
+$ANGSD -b Superblue4angsd.txt -anc $TRANSCRIPTOME -out angsd_Superblue_calling -P 8 -setMaxDepth 6000 -GL 1 -doMaf 1 -doMajorMinor 3 -doGlf 3 -doPost 1 -doVcf 1 -doCounts 1 -doDepth 1 -dumpCounts 1 -dosaf 1 -sites angsd_global_snplist.txt -minMapQ 20 -minQ 20 >& Superblue.log &
+
+gunzip *mafs.gz
